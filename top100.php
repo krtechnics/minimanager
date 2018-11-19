@@ -192,7 +192,7 @@ function top100($realmid, &$sqlr, &$sqlc)
                                 <td>'.char_get_level_color($char['level']).'</td>';
         if ($type === 'level')
         {
-            $guild_name = $sqlc->result($sqlc->query('SELECT name FROM guild WHERE guildid = '.$char['gname'].''), 0);
+            $guild_name = $sqlc->result($sqlc->query('SELECT BINARY name AS name FROM guild WHERE guildid = '.$char['gname'].''), 0);
             $days  = floor(round($char['totaltime'] / 3600)/24);
             $hours = round($char['totaltime'] / 3600) - ($days * 24);
             $time = '';

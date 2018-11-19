@@ -70,7 +70,7 @@ function char_main(&$sqlr, &$sqlc)
 
             if($char['guildid'] && $char['guildid'] != 0)
             {
-                $guild_name = $sqlc->result($sqlc->query('SELECT name FROM guild WHERE guildid ='.$char['guildid'].''), 0, 'name');
+                $guild_name = $sqlc->result($sqlc->query('SELECT BINARY name AS name FROM guild WHERE guildid ='.$char['guildid'].''), 0, 'name');
                 $guild_name = '<a href="guild.php?action=view_guild&amp;realm='.$realmid.'&amp;error=3&amp;id='.$char['guildid'].'" >'.$guild_name.'</a>';
                 $mrank = $char['rank'];
                 $guild_rank = $sqlc->result($sqlc->query('SELECT rname FROM guild_rank WHERE guildid ='.$char['guildid'].' AND rid='.$mrank.''), 0, 'rname');

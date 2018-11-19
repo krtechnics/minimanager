@@ -56,7 +56,7 @@ function edit_char() { //form needs update, uneditable fields have been removed 
 
             if($char['guildid'])
             {
-                $query = $sql->query("SELECT name FROM guild WHERE guildid ='{$char['guildid']}'");
+                $query = $sql->query("SELECT BINARY name AS name FROM guild WHERE guildid ='{$char['guildid']}'");
                 $guild_name = $sql->result($query, 0, 'name');
                 if ($user_lvl > 0 )
                     $guild_name = "<a href=\"guild.php?action=view_guild&amp;error=3&amp;id={$char['guildid']}\" >$guild_name</a>";

@@ -315,7 +315,7 @@ function view_guild()
     $dir = ($dir) ? 0 : 1;
     //==========================$_GET and SECURE end=============================
 
-    $query = $sqlc->query("SELECT guildid, BINARY name, BINARY info, BINARY MOTD, createdate,
+    $query = $sqlc->query("SELECT guildid, BINARY name AS name, BINARY info, BINARY MOTD, createdate,
                           (select count(*) from guild_member where guildid = '$guild_id') as mtotal,
                           (select count(*) from guild_member where guildid = '$guild_id' and guid in
                           (select guid from characters where online = 1)) as monline

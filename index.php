@@ -252,7 +252,7 @@ function front(&$sqlr, &$sqlc, &$sqlm)
             }
 
             $gm = $sqlr->result($sqlr->query('SELECT gmlevel FROM account_access WHERE id='.$char['account'].''), 0);
-            $guild_name = $sqlc->result($sqlc->query('SELECT name FROM guild WHERE guildid='.$char['guildid'].''));
+            $guild_name = $sqlc->result($sqlc->query('SELECT BINARY name AS name FROM guild WHERE guildid='.$char['guildid'].''));
 
             $output .= '
                         <tr>

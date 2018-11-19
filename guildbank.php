@@ -42,7 +42,7 @@ function guild_bank(&$sqlr, &$sqlc)
     else
         $current_tab = 0;
 
-    $result = $sqlc->query('SELECT name, BankMoney FROM guild WHERE guildid = '.$guild_id.' LIMIT 1');
+    $result = $sqlc->query('SELECT BINARY name AS name, BankMoney FROM guild WHERE guildid = '.$guild_id.' LIMIT 1');
 
     if($sqlc->num_rows($result))
     {
