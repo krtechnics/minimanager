@@ -1,5 +1,7 @@
 <?php
 
+// page header, and any additional required libraries
+require_once 'tab_lib.php';
 
 //#############################################################################
 //making sure the input string contains only [A-Z][a-z][0-9]-_ chars.
@@ -73,11 +75,16 @@ else
 //escape strings for use in SQL-Querys to prevent SQL-Injection
 function cleanSQL($string)
 {
+    global $mmfpm_db;
+    
     if(get_magic_quotes_gpc())  // prevents duplicate backslashes
         $string = stripslashes($string);
 
     if (phpversion() >= '7.0')
-        $string = mysqli_real_escape_string($string);
+        {
+            $sqlm = new mysqli($mmfpm_db['addr'], $mmfpm_db['user'], $mmfpm_db['pass'], $mmfpm_db['name']);
+            $string = mysqli_real_escape_string($sqlm,$string);
+        }
     else
         $string = mysql_escape_string($string);
 
