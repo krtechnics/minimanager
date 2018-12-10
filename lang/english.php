@@ -931,7 +931,7 @@ function lang_realm()
     'address' => 'Address',
     'port' => 'Port',
     'icon' => 'Icon',
-    'color' => 'Color',
+    'flag' => 'Flag',
     'timezone' => 'Time Zone',
     'edit_realm' => 'Edit Realm Data',
     'id' => 'ID',
