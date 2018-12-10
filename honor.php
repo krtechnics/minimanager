@@ -11,7 +11,16 @@ $sql->connect($characters_db[$realm_id]['addr'], $characters_db[$realm_id]['user
 
 $start = (isset($_GET['start'])) ? $sql->quote_smart($_GET['start']) : 0;
 $order_by = (isset($_GET['order_by'])) ? $sql->quote_smart($_GET['order_by']) :"honor";
-$query = $sql->query("SELECT C.guid, BINARY C.name AS name, C.race, C.class, C.totalHonorPoints AS honor , C.totalKills AS kills, C.level, C.arenaPoints AS arena, COALESCE(guild_member.guildid,0) as GNAME, C.gender FROM characters C LEFT JOIN guild_member ON C.guid = guild_member.guid WHERE race in (1,3,4,7,11) ORDER BY $order_by DESC LIMIT 25;");
+
+if ($_SESSION['user_lvl'] < 1)
+{
+	$query = $sql->query("SELECT C.guid, BINARY C.name AS name, C.race, C.class, C.totalHonorPoints AS honor , C.totalKills AS kills, C.level, C.arenaPoints AS arena, COALESCE(guild_member.guildid,0) as GNAME, C.gender, BINARY C.deleteInfos_Name AS deleted_name FROM characters C LEFT JOIN guild_member ON C.guid = guild_member.guid WHERE name<>'' AND race in (1,3,4,7,11) ORDER BY $order_by DESC LIMIT 25;");
+}
+else
+{
+	$query = $sql->query("SELECT C.guid, BINARY C.name AS name, C.race, C.class, C.totalHonorPoints AS honor , C.totalKills AS kills, C.level, C.arenaPoints AS arena, COALESCE(guild_member.guildid,0) as GNAME, C.gender, BINARY C.deleteInfos_Name AS deleted_name FROM characters C LEFT JOIN guild_member ON C.guid = guild_member.guid WHERE race in (1,3,4,7,11) ORDER BY $order_by DESC LIMIT 25;");
+}
+
 $this_page = $sql->num_rows($query);
 $output .= "
                 <script type=\"text/javascript\">
@@ -39,10 +48,13 @@ $output .= "
 
 while ($char = $sql->fetch_row($query))
 {
-    $guild_name = $sql->fetch_row($sql->query("SELECT `name` FROM `guild` WHERE `guildid`=".$char[8].";"));
+    $charname = ($char[1] != '') ? htmlentities($char[1]) :  htmlentities($char[10]) . " (Deleted)";
+	
+	$guild_name = $sql->fetch_row($sql->query("SELECT `name` FROM `guild` WHERE `guildid`=".$char[8].";"));
+	
     $output .= "
                             <tr>
-                                <td><a href=\"char.php?id=$char[0]\">".htmlentities($char[1])."</a></td>
+                                <td><a href=\"char.php?id=$char[0]\">$charname</a></td>
                                 <td><img src='img/c_icons/{$char[2]}-{$char[9]}.gif' onmousemove='toolTip(\"".char_get_race_name($char[2])."\",\"item_tooltip\")' onmouseout='toolTip()'></td>
                                 <td><img src='img/c_icons/{$char[3]}.gif' onmousemove='toolTip(\"".char_get_class_name($char[3])."\",\"item_tooltip\")' onmouseout='toolTip()'></td>
                                 <td>".char_get_level_color($char[6])."</td>
@@ -58,7 +70,14 @@ $output .= "
                         <br />
                     </fieldset>";
 
-$query = $sql->query("SELECT C.guid, BINARY C.name AS name, C.race, C.class, C.todayHonorPoints AS honor , C.totalKills AS kills, C.level, C.arenaPoints AS arena, COALESCE(guild_member.guildid,0) as GNAME, C.gender FROM characters C LEFT JOIN guild_member ON C.guid = guild_member.guid WHERE race not in (1,3,4,7,11) ORDER BY $order_by DESC LIMIT 25;");
+if ($_SESSION['user_lvl'] < 1)
+{					
+	$query = $sql->query("SELECT C.guid, BINARY C.name AS name, C.race, C.class, C.todayHonorPoints AS honor , C.totalKills AS kills, C.level, C.arenaPoints AS arena, COALESCE(guild_member.guildid,0) as GNAME, C.gender, BINARY C.deleteInfos_Name AS deleted_name FROM characters C LEFT JOIN guild_member ON C.guid = guild_member.guid WHERE name<>'' AND race not in (1,3,4,7,11) ORDER BY $order_by DESC LIMIT 25;");
+}
+else
+{
+	$query = $sql->query("SELECT C.guid, BINARY C.name AS name, C.race, C.class, C.todayHonorPoints AS honor , C.totalKills AS kills, C.level, C.arenaPoints AS arena, COALESCE(guild_member.guildid,0) as GNAME, C.gender, BINARY C.deleteInfos_Name AS deleted_name FROM characters C LEFT JOIN guild_member ON C.guid = guild_member.guid WHERE race not in (1,3,4,7,11) ORDER BY $order_by DESC LIMIT 25;");
+}
 $this_page = $sql->num_rows($query);
 $output .= "
                 <script type=\"text/javascript\">
@@ -86,10 +105,12 @@ $output .= "
 
 while ($char = $sql->fetch_row($query))
 {
+    $charname = ($char[1] != '') ? htmlentities($char[1]) :  htmlentities($char[10]) . " (Deleted)";
+	
     $guild_name = $sql->fetch_row($sql->query("SELECT `name` FROM `guild` WHERE `guildid`=".$char[8].";"));
     $output .= "
                             <tr>
-                                <td><a href=\"char.php?id=$char[0]\">".htmlentities($char[1])."</a></td>
+                                <td><a href=\"char.php?id=$char[0]\">$charname</a></td>
                                 <td><img src='img/c_icons/{$char[2]}-{$char[9]}.gif' onmousemove='toolTip(\"".char_get_race_name($char[2])."\",\"item_tooltip\")' onmouseout='toolTip()'></td>
                                 <td><img src='img/c_icons/{$char[3]}.gif' onmousemove='toolTip(\"".char_get_class_name($char[3])."\",\"item_tooltip\")' onmouseout='toolTip()'></td>
                                 <td>".char_get_level_color($char[6])."</td>
