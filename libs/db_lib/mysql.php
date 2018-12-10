@@ -48,6 +48,10 @@ class SQL //MySQL
   function result($query_id = 0, $row = 0, $field = NULL){
     return ($query_id) ? @mysql_result($query_id, $row, $field) : false;
   }
+  
+  function data_seek($query_id = 0, $row = 0){
+	return ($query_id) ? @mysql_data_seek($query_id, $row) : false;
+  }
 
   function fetch_row($query_id = 0){
     return ($query_id) ? @mysql_fetch_row($query_id) : false;

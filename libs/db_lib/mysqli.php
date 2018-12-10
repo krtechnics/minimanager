@@ -47,6 +47,10 @@ class SQL //MySQLi
             return $cur_row[0];
         } else return false;
     }
+	
+	function data_seek($query_id = 0, $row = 0){
+		return ($query_id) ? @mysqli_data_seek($query_id, $row) : false;
+	}
 
     function fetch_row($query_id = 0){
         return ($query_id) ? @mysqli_fetch_row($query_id) : false;

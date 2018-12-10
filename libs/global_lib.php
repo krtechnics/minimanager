@@ -66,7 +66,10 @@ function error($err)
     if (ob_get_length()>0) 
         ob_clean(); // clean output buffer
     ob_start();
-    debug_print_backtrace();
+	
+    if (isset($_SESSION['user_lvl']))
+		if ($_SESSION['user_lvl'] > 2)
+			debug_print_backtrace(); // show this info to user_lvl 3 and above
     $contents = str_replace("\n", '<br /><br />', ob_get_contents()); // catch backtrace
     ob_end_clean();
     define('ERROR_MSG', $err . '<br /><br />' . $contents); // define error

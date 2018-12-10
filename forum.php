@@ -94,7 +94,10 @@ function forum_view_forum(){
   if($enablesidecheck) $side = get_side();
   $mysql = new SQL;
   $link = $mysql->connect($mmfpm_db['addr'], $mmfpm_db['user'], $mmfpm_db['pass'], $mmfpm_db['name']);
-  if(!isset($_GET["id"])) error($forum_lang["no_such_forum"]);
+  if(!isset($_GET["id"])){
+	  error($forum_lang["no_such_forum"]);
+	  return;
+  }
   else $id = $mysql->quote_smart($_GET["id"]);
   if(!isset($_GET["page"])) $page = 0;
   else $page = $mysql->quote_smart($_GET["page"]);
@@ -104,23 +107,28 @@ function forum_view_forum(){
       if($fid == $id) $cat = $cid;
     }
   }
-  if(empty($forum_skeleton[$cat]["forums"][$id])) error($forum_lang["no_such_forum"]);
+  if(empty($forum_skeleton[$cat]["forums"][$id])){
+	  error($forum_lang["no_such_forum"]);
+	  return;
+  }
   $forum = $forum_skeleton[$cat]["forums"][$id];
-  if(($forum_skeleton[$cat]["level_read"] > $user_lvl) || ($forum["level_read"] > $user_lvl))
-    error($forum_lang["no_access"]);
+  if(($forum_skeleton[$cat]["level_read"] > $user_lvl) || ($forum["level_read"] > $user_lvl)){
+      error($forum_lang["no_access"]);
+	  return;
+  }
 
   if($user_lvl == 0 && $enablesidecheck){
     if($forum_skeleton[$cat]["side_access"] != "ALL"){ // Not an all side forum
       if($side == "NO") // No char
-        continue;
+        return;
       else if($forum_skeleton[$cat]["side_access"] != $side) // Forumside different of the user side
-        continue;
+        return;
     }
     if($forum["side_access"] != "ALL"){ // Not an all side forum
       if($side == "NO") // No char
-        continue;
+        return;
       else if($forum["side_access"] != $side) // Forumside different of the user side
-        continue;
+        return;
     }
   }
 
@@ -198,8 +206,10 @@ function forum_view_topic(){
       $id = $mysql->quote_smart($_GET["postid"]);
       $post = true;
     }
-    else
-      error($forum_lang["no_such_topic"]);
+    else{
+		error($forum_lang["no_such_topic"]);
+		return;
+	}
   }
 
 
@@ -220,7 +230,7 @@ FROM `{$characters_db[$realm_id]['name']}`.characters WHERE totaltime IN ( SELEC
 while($post = $mysql->fetch_row($posts)){
   $query .= "$post[1],";
 }
-mysql_data_seek($posts,0);
+$mysql->data_seek($posts,0);
 $query .= "0) GROUP BY account);";
     $link = $mysql->connect($characters_db[$realm_id]['addr'], $characters_db[$realm_id]['user'], $characters_db[$realm_id]['pass'], $characters_db[$realm_id]['name']);
     $results = $mysql->query($query);
@@ -237,8 +247,10 @@ $query .= "0) GROUP BY account);";
 
 //    $link = $mysql->connect($realm_db['addr'], $realm_db['user'], $realm_db['pass'], $realm_db['name']);
     $replies = $mysql->num_rows($posts);
-    if($replies==0)
-      error($forum_lang["no_such_topic"]);
+    if($replies==0){
+        error($forum_lang["no_such_topic"]);
+		return;
+	}
     $post = $mysql->fetch_row($posts);
     $fid = $post[3];
     $cat = 0;
@@ -247,23 +259,28 @@ $query .= "0) GROUP BY account);";
         if($fid_ == $fid) $cat = $cid;
       }
     }
-    if(empty($forum_skeleton[$cat]["forums"][$fid]))
-      error($forum_lang["no_such_forum"]);
+    if(empty($forum_skeleton[$cat]["forums"][$fid])){
+        error($forum_lang["no_such_forum"]);
+		return;
+	}
     $forum = $forum_skeleton[$cat]["forums"][$fid];
-    if($forum_skeleton[$cat]["level_read"] > $user_lvl || $forum["level_read"] > $user_lvl) error($forum_lang["no_access"]);
+    if($forum_skeleton[$cat]["level_read"] > $user_lvl || $forum["level_read"] > $user_lvl){
+		error($forum_lang["no_access"]);
+		return;
+	}
 
     if($user_lvl == 0 && $enablesidecheck){
       if($forum_skeleton[$cat]["side_access"] != "ALL"){ // Not an all side forum
         if($side == "NO") // No char
-          continue;
+          return;
         else if($forum_skeleton[$cat]["side_access"] != $side) // Forumside different of the user side
-          continue;
+          return;
       }
       if($forum["side_access"] != "ALL"){ // Not an all side forum
         if($side == "NO") // No char
-          continue;
+          return;
         else if($forum["side_access"] != $side) // Forumside different of the user side
-          continue;
+          return;
       }
     }
 
@@ -435,16 +452,20 @@ $query .= "0) GROUP BY account);";
     $output .= "<div class=\"top\"><h1>Stand by...</h1></div>";
 
     $post = $mysql->query("SELECT topic, id FROM mm_forum_posts WHERE id = '$id'"); // Get our post id
-    if($mysql->num_rows($post)==0)
-      error($forum_lang["no_such_topic"]);
+    if($mysql->num_rows($post)==0){
+        error($forum_lang["no_such_topic"]);
+		return;
+	}
     $post = $mysql->fetch_row($post);
     if($post[0]==$post[1])
       redirect("forum.php?action=view_topic&id=$id");
     $topic = $post[0];
     $posts = $mysql->query("SELECT id FROM mm_forum_posts WHERE topic = '$topic';"); // Get posts in our topic
     $replies = $mysql->num_rows($posts);
-    if($replies==0)
-      error($forum_lang["no_such_topic"]);
+    if($replies==0){
+        error($forum_lang["no_such_topic"]);
+		return;
+	}
     $row = 0;
     while($post = $mysql->fetch_row($posts)){ // Find the row of our post, so we could have his ratio (topic x/total topics) and knew the page to show
       $row++;
@@ -465,13 +486,21 @@ function forum_do_edit_close(){
   $mysql = new SQL;
   $link = $mysql->connect($mmfpm_db['addr'], $mmfpm_db['user'], $mmfpm_db['pass'], $mmfpm_db['name']);
 
-  if($user_lvl == 0)
-    error($forum_lang["no_access"]);
+  if($user_lvl == 0){
+      error($forum_lang["no_access"]);
+	  return;
+  }
 
-  if(!isset($_GET["id"])) error($forum_lang["no_such_topic"]);
+  if(!isset($_GET["id"])){
+	  error($forum_lang["no_such_topic"]);
+	  return;
+  }
   else $id = $mysql->quote_smart($_GET["id"]);
 
-  if(!isset($_GET["state"])) error("Bad request, please mail admin and describe what you did to get this error.");
+  if(!isset($_GET["state"])){
+	  error("Bad request, please mail admin and describe what you did to get this error.");
+	  return;
+  }
   else $state = $mysql->quote_smart($_GET["state"]);
 
   $mysql->query("UPDATE mm_forum_posts SET closed = '$state' WHERE id = '$id'");
@@ -484,13 +513,21 @@ function forum_do_edit_announce(){
   $mysql = new SQL;
   $link = $mysql->connect($mmfpm_db['addr'], $mmfpm_db['user'], $mmfpm_db['pass'], $mmfpm_db['name']);
 
-  if($user_lvl == 0)
-    error($forum_lang["no_access"]);
+  if($user_lvl == 0){
+      error($forum_lang["no_access"]);
+	  return;
+  }
 
-  if(!isset($_GET["id"])) error($forum_lang["no_such_topic"]);
+  if(!isset($_GET["id"])){
+	  error($forum_lang["no_such_topic"]);
+	  return;
+  }
   else $id = $mysql->quote_smart($_GET["id"]);
 
-  if(!isset($_GET["state"])) error("Bad request, please mail admin and describe what you did to get this error.");
+  if(!isset($_GET["state"])){
+	  error("Bad request, please mail admin and describe what you did to get this error.");
+	  return;
+  }
   else $state = $mysql->quote_smart($_GET["state"]);
 
   $mysql->query("UPDATE mm_forum_posts SET annouced = '$state' WHERE id = '$id'");
@@ -503,13 +540,21 @@ function forum_do_edit_stick(){
   $mysql = new SQL;
   $link = $mysql->connect($mmfpm_db['addr'], $mmfpm_db['user'], $mmfpm_db['pass'], $mmfpm_db['name']);
 
-  if($user_lvl == 0)
-    error($forum_lang["no_access"]);
+  if($user_lvl == 0){
+      error($forum_lang["no_access"]);
+	  return;
+  }
 
-  if(!isset($_GET["id"])) error($forum_lang["no_such_topic"]);
+  if(!isset($_GET["id"])){
+	  error($forum_lang["no_such_topic"]);
+	  return;
+  }
   else $id = $mysql->quote_smart($_GET["id"]);
 
-  if(!isset($_GET["state"])) error("Bad request, please mail admin and describe what you did to get this error.");
+  if(!isset($_GET["state"])){
+	  error("Bad request, please mail admin and describe what you did to get this error.");
+	  return;
+  }
   else $state = $mysql->quote_smart($_GET["state"]);
 
   $mysql->query("UPDATE mm_forum_posts SET sticked = '$state' WHERE id = '$id'");
@@ -522,13 +567,22 @@ function forum_delete_post(){
   $mysql = new SQL;
 
   $link = $mysql->connect($mmfpm_db['addr'], $mmfpm_db['user'], $mmfpm_db['pass'], $mmfpm_db['name']);
-  if(!isset($_GET["id"])) error($forum_lang["no_such_post"]);
+  if(!isset($_GET["id"])){
+	  error($forum_lang["no_such_post"]);
+	  return;
+  }
   else $id = $mysql->quote_smart($_GET["id"]);
 
   $topic = $mysql->query("SELECT id,topic,authorid,forum FROM mm_forum_posts WHERE id = '$id';");
-  if($mysql->num_rows($topic)==0) error($forum_lang["no_such_post"]);
+  if($mysql->num_rows($topic)==0){
+	  error($forum_lang["no_such_post"]);
+	  return;
+  }
   $topic = $mysql->fetch_row($topic);
-  if($user_lvl == 0 && $topic[2] != $user_id) error($forum_lang["no_access"]);
+  if($user_lvl == 0 && $topic[2] != $user_id){
+	  error($forum_lang["no_access"]);
+	  return;
+  }
   $fid = $topic[3];
 
   $topic2 = $mysql->query("SELECT name FROM mm_forum_posts WHERE id = '{$topic[1]}';");
@@ -541,8 +595,10 @@ function forum_delete_post(){
     }
   }
 
-  if(empty($forum_skeleton[$cat]["forums"][$fid])) // No such forum..
-    error($forum_lang["no_such_forum"]);
+  if(empty($forum_skeleton[$cat]["forums"][$fid])){ // No such forum..
+      error($forum_lang["no_such_forum"]);
+	  return;
+  }
   $forum = $forum_skeleton[$cat]["forums"][$fid];
   $output .= "<div class=\"top\"><h1>{$forum_lang["forums"]}</h1>{$forum_lang["you_are_here"]} : <a href=\"forum.php\">{$forum_lang["forum_index"]}</a> -> <a href=\"forum.php?action=view_forum&amp;id={$fid}\">{$forum["name"]}</a> -> <a href=\"forum.php?action=view_topic&amp;id={$topic[1]}\">{$name[0]}</a> -> {$forum_lang["delete"]}!</div><center><table class=\"lined\">";
   if($topic[0]==$topic[1])
@@ -561,13 +617,22 @@ function forum_do_delete_post(){
   $mysql = new SQL;
   $link = $mysql->connect($mmfpm_db['addr'], $mmfpm_db['user'], $mmfpm_db['pass'], $mmfpm_db['name']);
 
-  if(!isset($_GET["id"])) error($forum_lang["no_such_post"]);
+  if(!isset($_GET["id"])){
+	  error($forum_lang["no_such_post"]);
+	  return;
+  }
   else $id = $mysql->quote_smart($_GET["id"]);
 
   $topic = $mysql->query("SELECT id,topic,name,authorid,forum FROM mm_forum_posts WHERE id = '$id';");
-  if($mysql->num_rows($topic)==0) error($forum_lang["no_such_post"]);
+  if($mysql->num_rows($topic)==0){
+	  error($forum_lang["no_such_post"]);
+	  return;
+  }
   $topic = $mysql->fetch_row($topic);
-  if($user_lvl == 0 && $topic[3] != $user_id) error($forum_lang["no_access"]);
+  if($user_lvl == 0 && $topic[3] != $user_id){
+	  error($forum_lang["no_access"]);
+	  return;
+  }
   $fid = $topic[4];
 
   if($id==$topic[1]){
@@ -601,12 +666,17 @@ function forum_add_topic(){
       $mintimeb4post = $mysql->fetch_row($userposts);
       $mintimeb4post = time() - strtotime($mintimeb4post[0]);
 
-      if($mintimeb4post < $minfloodtime)
-        error($forum_lang["please_wait"]);
+      if($mintimeb4post < $minfloodtime){
+          error($forum_lang["please_wait"]);
+		  return;
+	  }
     }
   }
 
-  if(!isset($_GET["id"])) error($forum_lang["no_such_forum"]);
+  if(!isset($_GET["id"])){
+	  error($forum_lang["no_such_forum"]);
+	  return;
+  }
   else $id = $mysql->quote_smart($_GET["id"]);
 
   $cat = 0;
@@ -616,22 +686,28 @@ function forum_add_topic(){
     }
   }
 
-  if(empty($forum_skeleton[$cat]["forums"][$id])) error($forum_lang["no_such_forum"]);
+  if(empty($forum_skeleton[$cat]["forums"][$id])){
+	  error($forum_lang["no_such_forum"]);
+	  return;
+  }
   $forum = $forum_skeleton[$cat]["forums"][$id];
-  if($forum_skeleton[$cat]["level_post_topic"] > $user_lvl || $forum["level_post_topic"] > $user_lvl) error($forum_lang["no_access"]);
+  if($forum_skeleton[$cat]["level_post_topic"] > $user_lvl || $forum["level_post_topic"] > $user_lvl){
+	  error($forum_lang["no_access"]);
+	  return;
+  }
 
   if($user_lvl == 0 && $enablesidecheck){
     if($forum_skeleton[$cat]["side_access"] != "ALL"){ // Not an all side forum
       if($side == "NO") // No char
-        continue;
+        return;
       else if($forum_skeleton[$cat]["side_access"] != $side) // Forumside different of the user side
-        continue;
+        return;
     }
     if($forum["side_access"] != "ALL"){ // Not an all side forum
       if($side == "NO") // No char
-        continue;
+        return;
       else if($forum["side_access"] != $side) // Forumside different of the user side
-        continue;
+        return;
     }
   }
 
@@ -685,9 +761,9 @@ function forum_do_add_topic(){
   if($enablesidecheck) $side = get_side(); // Better to use it here instead of call it many time in the loop :)
 
   $mysql = new SQL;
-  $mysql->connect($mmfpm_db['addr'], $mmfpm_db['user'], $mmfpm_db['pass'], $mmfpm_db['name']);
+  $link = $mysql->connect($mmfpm_db['addr'], $mmfpm_db['user'], $mmfpm_db['pass'], $mmfpm_db['name']);
 
-
+if($minfloodtime > 0)
   {
     $userposts = $mysql->query("SELECT time FROM mm_forum_posts WHERE authorid = '$user_id' ORDER BY id DESC LIMIT 1;");
     if($mysql->num_rows($userposts) != 0)
@@ -695,12 +771,17 @@ function forum_do_add_topic(){
       $mintimeb4post = $mysql->fetch_row($userposts);
       $mintimeb4post = time() - strtotime($mintimeb4post[0]);
 
-      if($mintimeb4post < $minfloodtime)
+      if($mintimeb4post < $minfloodtime){
         error($forum_lang["please_wait"]);
+		return;
+	  }
     }
   }
 
-  if(!isset($_POST['forum'])) error($forum_lang["no_such_forum"]);
+  if(!isset($_POST['forum'])) {
+	  error($forum_lang["no_such_forum"]);
+	  return;
+  }
   else $forum = $mysql->quote_smart($_POST['forum']);
 
   $cat = 0;
@@ -709,22 +790,29 @@ function forum_do_add_topic(){
       if($fid == $forum) $cat = $cid;
     }
   }
-  if(empty($forum_skeleton[$cat]["forums"][$forum])) error($forum_lang["no_such_forum"]);
+  if(empty($forum_skeleton[$cat]["forums"][$forum])) {
+	  error($forum_lang["no_such_forum"]);
+	  return;
+  }
   $forum_ = $forum_skeleton[$cat]["forums"][$forum];
-  if($forum_skeleton[$cat]["level_post_topic"] > $user_lvl || $forum_["level_post_topic"] > $user_lvl) error($forum_lang["no_access"]);
+  
+  if($forum_skeleton[$cat]["level_post_topic"] > $user_lvl || $forum_["level_post_topic"] > $user_lvl) {
+	  error($forum_lang["no_access"]);
+	  return;
+  }
 
   if($user_lvl == 0 && $enablesidecheck){
     if($forum_skeleton[$cat]["side_access"] != "ALL"){ // Not an all side forum
       if($side == "NO") // No char
-        continue;
+        return;
       else if($forum_skeleton[$cat]["side_access"] != $side) // Forumside different of the user side
-        continue;
+        return;
     }
     if($forum_["side_access"] != "ALL"){ // Not an all side forum
       if($side == "NO") // No char
-        continue;
+        return;
       else if($forum_["side_access"] != $side) // Forumside different of the user side
-        continue;
+        return;
     }
   }
 
@@ -736,20 +824,23 @@ function forum_do_add_topic(){
   if (strlen($name) > 49){
     $mysql->close();
     error($forum_lang["name_too_long"]);
+	return;
   }
 
   if (strlen($name) < 5){
-    $mysql->close();
+	$mysql->close();
     error($forum_lang["name_too_short"]);
+	return;
   }
+  
+  $msg = str_replace('\n', '<br />', $msg);
+  $msg = str_replace('\r', '<br />', $msg);
 
   if (strlen($msg) < 5){
     $mysql->close();
     error($forum_lang["msg_too_short"]);
+	return;
   }
-
-  $msg = str_replace('\n', '<br />', $msg);
-//  $msg = str_replace('\r', '<br />', $msg);
 
   $time = date("m/d/y H:i:s");
 
@@ -768,7 +859,7 @@ function forum_do_add_post(){
   if($enablesidecheck) $side = get_side(); // Better to use it here instead of call it many time in the loop :)
 
   $mysql = new SQL;
-  $link = $link = $mysql->connect($mmfpm_db['addr'], $mmfpm_db['user'], $mmfpm_db['pass'], $mmfpm_db['name']);
+  $link = $mysql->connect($mmfpm_db['addr'], $mmfpm_db['user'], $mmfpm_db['pass'], $mmfpm_db['name']);
 
   if($minfloodtime > 0)
   {
@@ -778,12 +869,17 @@ function forum_do_add_post(){
       $mintimeb4post = $mysql->fetch_row($userposts);
       $mintimeb4post = time() - strtotime($mintimeb4post[0]);
 
-      if($mintimeb4post < $minfloodtime)
+      if($mintimeb4post < $minfloodtime){
         error($forum_lang["please_wait"]);
+		return;
+	  }
     }
   }
 
-  if(!isset($_POST['forum'])) error($forum_lang["no_such_forum"]);
+  if(!isset($_POST['forum'])){
+	  error($forum_lang["no_such_forum"]);
+	  return;
+  }
   else $forum = $mysql->quote_smart($_POST['forum']);
 
   $cat = 0;
@@ -793,37 +889,48 @@ function forum_do_add_post(){
     }
   }
 
-  if(empty($forum_skeleton[$cat]["forums"][$forum])) error($forum_lang["no_such_forum"]);
+  if(empty($forum_skeleton[$cat]["forums"][$forum])){
+	  error($forum_lang["no_such_forum"]);
+	  return;
+  }
   $forum_ = $forum_skeleton[$cat]["forums"][$forum];
-  if((($user_lvl > 0)||!$closed)&&($forum_skeleton[$cat]["level_post"] > $user_lvl || $forum_["level_post"] > $user_lvl)) error($forum_lang["no_access"]);
+  if(isset($closed))
+	if((($user_lvl > 0)||!$closed)&&($forum_skeleton[$cat]["level_post"] > $user_lvl || $forum_["level_post"] > $user_lvl)){
+		error($forum_lang["no_access"]);
+		return;
+	}
 
   if($user_lvl == 0 && $enablesidecheck){
     if($forum_skeleton[$cat]["side_access"] != "ALL"){ // Not an all side forum
       if($side == "NO") // No char
-        continue;
+        return;
       else if($forum_skeleton[$cat]["side_access"] != $side) // Forumside different of the user side
-        continue;
+        return;
     }
     if($forum_["side_access"] != "ALL"){ // Not an all side forum
       if($side == "NO") // No char
-        continue;
+        return;
       else if($forum_["side_access"] != $side) // Forumside different of the user side
-        continue;
+        return;
     }
   }
 
-  if(!isset($_POST['topic'])) error($forum_lang["no_such_topic"]);
+  if(!isset($_POST['topic'])){
+	  error($forum_lang["no_such_topic"]);
+	  return;
+  }
   else $topic = $mysql->quote_smart($_POST['topic']);
 
 //  $_POST['msg'] = htmlspecialchars($_POST['msg']);
   $msg = trim($mysql->quote_smart($_POST['msg']), " ");
 
   $msg = str_replace('\n', '<br />', $msg);
-//  $msg = str_replace('\r', '<br />', $msg);
+  $msg = str_replace('\r', '<br />', $msg);
 
   if (strlen($msg) < 5){
     $mysql->close();
     error($forum_lang["msg_too_short"]);
+	return;
   }
 
   $name = $mysql->query("SELECT name FROM mm_forum_posts WHERE id = '$topic';");
@@ -833,7 +940,7 @@ function forum_do_add_post(){
   $time = date("m/d/y H:i:s");
 
   $mysql->query("INSERT INTO mm_forum_posts (authorid, authorname, forum, topic, name, text, time) VALUES ('$user_id', '$user_name', '$forum', $topic, '$name', '$msg', '$time');");
-  $id = @mysql_insert_id($link);
+  $id = $mysql->insert_id();
   $mysql->query("UPDATE mm_forum_posts SET lastpost = $id WHERE id = $topic;");
 
   $mysql->close();
@@ -848,15 +955,20 @@ function forum_edit_post(){
   $mysql = new SQL;
   $link = $mysql->connect($mmfpm_db['addr'], $mmfpm_db['user'], $mmfpm_db['pass'], $mmfpm_db['name']);
 
-  if(!isset($_GET["id"])) error($forum_lang["no_such_post"]);
+  if(!isset($_GET["id"])){
+	  error($forum_lang["no_such_post"]);
+	  return;
+  }
   else $id = $mysql->quote_smart($_GET["id"]);
 
   $post = $mysql->query("SELECT id,topic,authorid,forum,name,text FROM mm_forum_posts WHERE id = '$id';");
   if($mysql->num_rows($post)==0) error($forum_lang["no_such_post"]);
   $post = $mysql->fetch_row($post);
 
-  if($user_lvl == 0 && $user_id != $post[2])
-    error($forum_lang["no_access"]);
+  if($user_lvl == 0 && $user_id != $post[2]){
+	  error($forum_lang["no_access"]);
+	  return;
+  }
 
   $cat = 0;
   foreach($forum_skeleton as $cid => $category){
@@ -864,8 +976,10 @@ function forum_edit_post(){
       if($fid_ == $post[3]) $cat = $cid;
     }
   }
-  if(empty($forum_skeleton[$cat]["forums"][$post[3]])) // No such forum..
-    error($forum_lang["no_such_forum"]);
+  if(empty($forum_skeleton[$cat]["forums"][$post[3]])){ // No such forum..
+      error($forum_lang["no_such_forum"]);
+	  return;
+  }
   $forum = $forum_skeleton[$cat]["forums"][$post[3]];
 
   $output .= "<div class=\"top\"><h1>{$forum_lang["forums"]}</h1>{$forum_lang["you_are_here"]} : <a href=\"forum.php\">{$forum_lang["forum_index"]}</a> -> <a href=\"forum.php?action=view_forum&amp;id={$post[3]}\">{$forum["name"]}</a> -> <a href=\"forum.php?action=view_topic&amp;id={$post[1]}\">{$post[4]}</a> -> {$forum_lang["edit"]}</div><form action=\"forum.php?action=do_edit_post\" method=\"POST\" name=\"form\"><center><table class=\"lined\">";
@@ -927,9 +1041,15 @@ function forum_do_edit_post(){
   $mysql = new SQL;
   $link = $link = $mysql->connect($mmfpm_db['addr'], $mmfpm_db['user'], $mmfpm_db['pass'], $mmfpm_db['name']);
 
-  if(!isset($_POST['forum'])) error($forum_lang["no_such_forum"]);
+  if(!isset($_POST['forum'])){
+	 error($forum_lang["no_such_forum"]);
+	 return;
+  }
   else $forum = $mysql->quote_smart($_POST['forum']);
-  if(!isset($_POST['post'])) error($forum_lang["no_such_post"]);
+  if(!isset($_POST['post'])){
+	  error($forum_lang["no_such_post"]);
+	  return;
+  }
   else $post = $mysql->quote_smart($_POST['post']);
 
   if(!isset($_POST['name']))
@@ -941,10 +1061,12 @@ function forum_do_edit_post(){
     if (strlen($name) > 49){
       $mysql->close();
       error($forum_lang["name_too_long"]);
+	  return;
     }
     if (strlen($name) < 5){
       $mysql->close();
       error($forum_lang["name_too_short"]);
+	  return;
     }
   }
 
@@ -954,10 +1076,11 @@ function forum_do_edit_post(){
   if (strlen($msg) < 5){
     $mysql->close();
     error($forum_lang["msg_too_short"]);
+	return;
   }
 
   $msg = str_replace('\n', '<br />', $msg);
-//  $msg = str_replace('\r', '<br />', $msg);
+  $msg = str_replace('\r', '<br />', $msg);
 
   $result = $mysql->query("SELECT topic FROM mm_forum_posts WHERE id = $post;");
   $topicid = $mysql->fetch_row($result);
@@ -981,14 +1104,20 @@ function forum_move_topic(){
   $mysql = new SQL;
 
   $link = $mysql->connect($mmfpm_db['addr'], $mmfpm_db['user'], $mmfpm_db['pass'], $mmfpm_db['name']);
-  if(!isset($_GET["id"])) error($forum_lang["no_such_topic"]);
+  if(!isset($_GET["id"])){
+	  error($forum_lang["no_such_topic"]);
+	  return;
+  }
   else $id = $mysql->quote_smart($_GET["id"]);
 
   $topic = $mysql->query("SELECT id,topic,authorid,forum, name FROM mm_forum_posts WHERE id = '$id';");
   //                0 1   2   3   4
   if($mysql->num_rows($topic)==0) error($forum_lang["no_such_topic"]);
   $topic = $mysql->fetch_row($topic);
-  if($user_lvl == 0) error($forum_lang["no_access"]);
+  if($user_lvl == 0){
+	  error($forum_lang["no_access"]);
+	  return;
+  }
   $fid = $topic[3];
 
   $cat = 0;
@@ -998,8 +1127,10 @@ function forum_move_topic(){
     }
   }
 
-  if(empty($forum_skeleton[$cat]["forums"][$fid])) // No such forum..
-    error($forum_lang["no_such_forum"]);
+  if(empty($forum_skeleton[$cat]["forums"][$fid])){ // No such forum..
+      error($forum_lang["no_such_forum"]);
+	  return;
+  }
   $forum = $forum_skeleton[$cat]["forums"][$fid];
 
   $output .= "<div class=\"top\"><h1>{$forum_lang["forums"]}</h1>{$forum_lang["you_are_here"]} : <a href=\"forum.php\">{$forum_lang["forum_index"]}</a> -> <a href=\"forum.php?action=view_forum&amp;id={$fid}\">{$forum["name"]}</a> -> <a href=\"forum.php?action=view_topic&amp;id={$topic[1]}\">{$topic[4]}</a> -> {$forum_lang["move"]}!</div><center><table class=\"lined\">
@@ -1027,9 +1158,15 @@ function forum_do_move_topic(){
   $mysql = new SQL;
   $link = $mysql->connect($mmfpm_db['addr'], $mmfpm_db['user'], $mmfpm_db['pass'], $mmfpm_db['name']);
 
-  if(!isset($_POST['forum'])) error($forum_lang["no_such_forum"]);
+  if(!isset($_POST['forum'])){
+	  error($forum_lang["no_such_forum"]);
+	  return;
+  }
   else $forum = $mysql->quote_smart($_POST['forum']);
-  if(!isset($_POST['id'])) error($forum_lang["no_such_topic"]);
+  if(!isset($_POST['id'])){
+	  error($forum_lang["no_such_topic"]);
+	  return;
+  }
   else $id = $mysql->quote_smart($_POST['id']);
 
   $mysql->query("UPDATE mm_forum_posts SET forum = '$forum' WHERE topic = '$id'"); // update topic' s last post id

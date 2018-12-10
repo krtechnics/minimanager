@@ -70,8 +70,8 @@ function do_clickable($text){
     global $userid;
     // From  PunBB
     $text = ' '.$text;
-    $text = preg_replace('#([\s\(\)])(https?|ftp|news){1}://([\w\-]+\.([\w\-]+\.)*[\w]+(:[0-9]+)?(/[^"\s\(\)<\[]*)?)#sie', '\'$1\'.handle_url_tag(\'$2://$3\')', $text);
-    $text = preg_replace('#([\s\(\)])(www|ftp)\.(([\w\-]+\.)*[\w]+(:[0-9]+)?(/[^"\s\(\)<\[]*)?)#sie', '\'$1\'.handle_url_tag(\'$2.$3\', \'$2.$3\')', $text);
+    $text = preg_replace('#([\s\(\)])(https?|ftp|news){1}://([\w\-]+\.([\w\-]+\.)*[\w]+(:[0-9]+)?(/[^"\s\(\)<\[]*)?)#si', '\'$1\'.handle_url_tag(\'$2://$3\')', $text);
+    $text = preg_replace('#([\s\(\)])(www|ftp)\.(([\w\-]+\.)*[\w]+(:[0-9]+)?(/[^"\s\(\)<\[]*)?)#si', '\'$1\'.handle_url_tag(\'$2.$3\', \'$2.$3\')', $text);
     // Regex [youtube] et [/youtube]
     $uid = $userid;
     $text = preg_replace("#\[youtube\](.*?)\[/youtube\]#si", "[youtube:$uid]\\1[/youtube:$uid]", $text);
@@ -82,8 +82,8 @@ function do_clickable($text){
 function bbcode_parse($text, $brfix = 1, $emoticons = 1, $wow = 1){
     // By BlackWizard, https://www.phpcs.com/codes/BBCODE-SIMPLEMENT_17638.aspx
     global $forum_lang, $userid;
-    $text = preg_replace("#\[img\]((ht|f)tp://)([^\r\n\t<\"]*?)\[/img\]#sie", "'<img border=\"0\" src=\\1' . str_replace(' ', '%20', '\\3') . '>'", $text);
-    $text = preg_replace("#\[url\]((ht|f)tp://)([^\r\n\t<\"]*?)\[/url\]#sie", "'<a href=\"\\1' . str_replace(' ', '%20', '\\3') . '\" target=blank>\\1\\3</a>'", $text);
+    $text = preg_replace("#\[img\]((ht|f)tp://)([^\r\n\t<\"]*?)\[/img\]#si", "'<img border=\"0\" src=\\1' . str_replace(' ', '%20', '\\3') . '>'", $text);
+    $text = preg_replace("#\[url\]((ht|f)tp://)([^\r\n\t<\"]*?)\[/url\]#si", "'<a href=\"\\1' . str_replace(' ', '%20', '\\3') . '\" target=blank>\\1\\3</a>'", $text);
     $text = preg_replace("/\[url=(.+?)\](.+?)\[\/url\]/", "<a href=\"$1\" target=\"blank\">$2</a>", $text);
     $text = preg_replace("/\[b\](.+?)\[\/b\]/", "<b>$1</b>", $text);
     $text = preg_replace("/\[i\](.+?)\[\/i\]/", "<i>$1</i>", $text);
@@ -191,10 +191,10 @@ function gen_avatar_panel($level,$sex,$race,$class,$info=1,$gm=0){
     if($info == 1)
     {
         $return .= "<div style=\"margin-top:2px;\">
-    <a href=\"#\" onmouseover=\"toolTip('{$lang_index["class"]} : ".char_get_class_name($class)."','item_tooltip')\" onmouseout=\"toolTip()\">
-    <img src=\"img/c_icons/$class.gif\" border=\"0\" alt=\"\" /></a>
-    <a href=\"#\" onmouseover=\"toolTip('{$lang_index["race"]} : ".char_get_race_name($race)."','item_tooltip')\" onmouseout=\"toolTip()\">
-    <img src=\"img/c_icons/$race-$sex.gif\" border=\"0\" alt=\"\" /></a>";
+    <a href=\"#\" onmouseover=\"toolTip('{$lang_index["class"]} ".char_get_class_name($class)."','item_tooltip')\" onmouseout=\"toolTip()\">
+    <img src=\"img/c_icons/$class.gif\" border=\"0\" alt=".char_get_class_name($class)." /></a>
+    <a href=\"#\" onmouseover=\"toolTip('{$lang_index["race"]} ".char_get_race_name($race)."','item_tooltip')\" onmouseout=\"toolTip()\">
+    <img src=\"img/c_icons/$race-$sex.gif\" border=\"0\" alt=".char_get_class_name($class)." /></a>";
     }
 
     $return .= "</div>";

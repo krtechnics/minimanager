@@ -18,7 +18,7 @@ $output .= '
                                 <h1>
                                     <font class="error">
                                         <img src="img/warn_red.gif" width="48" height="48" alt="error" />
-                                        <br />ERR!
+                                        <br />ERROR!
                                     </font>
                                 </h1>
                                 <br />'.$err.'<br />
