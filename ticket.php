@@ -35,13 +35,13 @@ function browse_tickets(&$sqlc)
     //==========================$_GET and SECURE end=============================
 
     //get total number of items
-    $query_1 = $sqlc->query('SELECT count(*) FROM gm_tickets');
+    $query_1 = $sqlc->query('SELECT count(*) FROM gm_ticket');
     $all_record = $sqlc->result($query_1,0);
     unset($query_1);
 
-    $query = $sqlc->query("SELECT gm_tickets.guid, gm_tickets.guid, SUBSTRING_INDEX(gm_tickets.message,' ',6), BINARY characters.name AS name, characters.online
-                            FROM gm_tickets,characters
-                                WHERE gm_tickets.guid = characters.guid
+    $query = $sqlc->query("SELECT gm_ticket.id, gm_ticket.playerGuid, SUBSTRING_INDEX(gm_ticket.description,' ',6), BINARY characters.name AS name, characters.online
+                            FROM gm_ticket,characters
+                                WHERE gm_ticket.playerGuid = characters.guid
                                   ORDER BY $order_by $order_dir LIMIT $start, $itemperpage");
 
     $output .="
@@ -80,15 +80,15 @@ function browse_tickets(&$sqlc)
                         <tr>";
         if($user_lvl >= $action_permission['delete'])
         $output .="
-                            <td><input type=\"checkbox\" name=\"check[]\" value=\"$ticket[0]\" onclick=\"CheckCheckAll(document.form);\" /></td>";
+                            <td><input type=\"checkbox\" name=\"check\" value=\"$ticket[0]\" onclick=\"CheckCheckAll(document.form);\" /></td>";
         if($user_lvl >= $action_permission['update'])
             $output .="
-                            <td><a href=\"ticket.php?action=edit_ticket&amp;error=4&amp;id=$ticket[0]\">{$lang_global['edit']}</a></td>";
+                            <td><a href=\"ticket.php?action=edit_ticket&amp;id=$ticket[0]\">{$lang_global['edit']}</a></td>";
         $output .="
                             <td>$ticket[0]</td>
                             <td>".($ticket[4] ? "<img src=\"img/up.gif\" alt=\"online\">" : "<img src=\"img/down.gif\" alt=\"offline\">")."</td>
                             <td><a href=\"char.php?id=$ticket[1]\">".htmlentities($ticket[3])."</a></td>
-                            <td>".htmlentities($ticket[2])." ...</td>
+                            <td>".htmlentities($ticket[2])."</td>
                         </tr>";
     }
     unset($query);
@@ -111,8 +111,11 @@ function browse_tickets(&$sqlc)
                         </tr>
                     </table>
                 </form>
-                <br />
-            </center>";
+            </center>
+			<ul>
+			<li>'Delete Checked Ticket(s)' option needs .reload gm_ticket to apply changes ingame.</li>
+			<li>If the deleted ticket was a open one, the author of that ticket will still see his/her ticket as pending till reloging.</li>
+			</ul>";
 }
 
 
@@ -137,7 +140,7 @@ function delete_tickets()
     {
         if ($check[$i] != "" )
         {
-            $query = $sqlc->query("DELETE FROM gm_tickets WHERE guid = '$check[$i]'");
+            $query = $sqlc->query("DELETE FROM gm_ticket WHERE id = '$check[$i]'");
             $deleted_tickets++;
         }
     }
@@ -167,10 +170,10 @@ function edit_ticket()
     else
         redirect("ticket.php?error=1");
 
-    $query = $sqlc->query("SELECT gm_tickets.guid, gm_tickets.message text, BINARY `characters`.name AS name
-                            FROM gm_tickets,`characters`
-                            LEFT JOIN gm_tickets k1 ON k1.`guid`=`characters`.`guid`
-                            WHERE gm_tickets.guid = `characters`.`guid` AND gm_tickets.guid = '$id'");
+    $query = $sqlc->query("SELECT gm_ticket.playerGuid, gm_ticket.description text, BINARY `characters`.name AS name
+                            FROM `characters`
+                            LEFT JOIN gm_ticket ON gm_ticket.playerGuid =`characters`.`guid`
+                            WHERE gm_ticket.playerGuid = `characters`.`guid` AND gm_ticket.id = '$id'");
 
     if ($ticket = $sqlc->fetch_row($query))
     {
@@ -218,8 +221,11 @@ function edit_ticket()
                             </table>
                         </form>
                     </fieldset>
-                    <br /><br />
-                </center>";
+                    <br />
+                </center>
+				<ul>
+					<li>'Update Ticket' option needs .reload gm_ticket to apply changes ingame.</li>
+				</ul>";
     }
     else
         error($lang_global['err_no_records_found']);
@@ -246,7 +252,7 @@ function do_edit_ticket()
     else
         redirect("ticket.php?error=1");
 
-    $query = $sqlc->query("UPDATE gm_tickets SET message='$new_text' WHERE guid = '$id'");
+    $query = $sqlc->query("UPDATE gm_ticket SET description='$new_text' WHERE id = '$id'");
 
     if ($sqlc->affected_rows())
         redirect("ticket.php?error=5");
