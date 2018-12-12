@@ -42,13 +42,13 @@ $sqlm = new SQL; //mysql_real_escape_string needs a sql connection
 $sqlm->connect($mmfpm_db['addr'], $mmfpm_db['user'], $mmfpm_db['pass'], $mmfpm_db['name']);
 
 foreach ($_POST as $key => $value)
-    $_POST[$key] = cleanSQL($value);
+    $_POST[$key] = $sqlm->quote_smart($value);
 
 foreach ($_GET as $key => $value)
-    $_GET[$key] = cleanSQL($value);
+    $_GET[$key] = $sqlm->quote_smart($value);
 
 foreach ($_COOKIE as $key => $value)
-    $_COOKIE[$key] = cleanSQL($value);
+    $_COOKIE[$key] = $sqlm->quote_smart($value);
 
 $sqlm->close();
 unset($sqlm);
