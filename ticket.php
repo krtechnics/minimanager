@@ -14,11 +14,14 @@ class tickets
 		global $output, $lang_global, $lang_ticket, $action_permission, $user_lvl, $itemperpage;
 
 		//==========================$_GET and SECURE=================================
-		$start = (isset($_GET['start']) && is_numeric($_GET['start'])) ? $sqlc->quote_smart($_GET['start']) : 0;
-
-		$order_by = (isset($_GET['order_by'])&& preg_match('/^[_[:lower:]]{1,10}$/', $_GET['order_by'])) ? $sqlc->quote_smart($_GET['order_by']) : 'id';
-
-		$dir = (isset($_GET['dir']) && preg_match('/^[01]{1}$/', $_GET['dir'])) ? $sqlc->quote_smart($_GET['dir']) : 1;
+		$start = (isset($_GET['start'])) ? $sqlc->quote_smart($_GET['start']) : 0;
+		$start = (is_numeric($start)) ? $start : 0;
+	
+        $order_by = (isset($_GET['order_by'])) ? $sqlc->quote_smart($_GET['order_by']) : 'id';
+        $order_by = (preg_match('/^[_[:lower:]]{1,10}$/', $order_by)) ? $order_by : 'id';
+			
+        $dir = (isset($_GET['dir'])) ? $sqlc->quote_smart($_GET['dir']) : 1;
+		$dir = (preg_match('/^[01]{1}$/', $dir)) ? $dir : 1;
 
 		$order_dir = ($dir) ? 'ASC' : 'DESC';
 		$dir = ($dir) ? 0 : 1;
