@@ -48,7 +48,7 @@ function add_motd(&$sqlm)
 //#############################################################################
 function edit_motd(&$sqlm)
 {
-    global $output, $lang_motd, $lang_global,  $realm_id, $mmfpm_db, $action_permission;
+    global $output, $lang_motd, $lang_global, $mmfpm_db, $action_permission;
     valid_login($action_permission['update']);
 
     $sqlm = new SQL;
@@ -114,10 +114,10 @@ function do_add_motd(&$sqlm)
     if (4096 < strlen($msg))
         redirect('motd.php?error=2');
 
-    $by = date('m/d/y H:i:s').' Posted by: '.$user_name;
+    $posted_by = date('m/d/y H:i:s').' Posted by: '.$user_name;
 
-    $sqlm->query('INSERT INTO mm_motd (realmid, type, content) VALUES (\''.$realm_id.'\', \''.$by.'\', \''.$msg.'\')');
-    unset($by);
+    $sqlm->query('INSERT INTO mm_motd (realmid, type, content) VALUES (\''.$realm_id.'\', \''.$posted_by.'\', \''.$msg.'\')');
+    unset($posted_by);
     unset($msg);
     redirect('index.php');
 }
@@ -158,7 +158,7 @@ function do_edit_motd(&$sqlm)
 //#####################################################################################################
 function delete_motd(&$sqlm)
 {
-    global $action_permission, $realm_id, $mmfpm_db;
+    global $action_permission, $mmfpm_db;
     valid_login($action_permission['delete']);
 
     $sqlm = new SQL;
@@ -219,7 +219,7 @@ elseif ('edit_motd' == $action)
 elseif ('do_edit_motd' == $action)
     do_edit_motd($sqlm);
 else
-    add_motd();
+    add_motd($sqlm);
 
 unset($action);
 unset($action_permission);
