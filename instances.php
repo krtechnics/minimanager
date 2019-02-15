@@ -40,7 +40,7 @@ function instances()
     $all_record = $sqlw->result($sqlw->query('SELECT count(*) FROM instance_template'), 0);
 
     // main data that we need for this page, instances
-    $result = $sqlw->query('SELECT mapid, level_min, level_max FROM access_requirement
+    $result = $sqlw->query('SELECT mapid, level_min, level_max, item_level, quest_done_A AS quest_a, quest_done_H AS quest_h, comment AS map FROM access_requirement
                             ORDER BY '.$order_by.' '.$order_dir.' LIMIT '.$start.', '.$itemperpage.';');
 
     /*---------------Page Specific Data Starts Here--------------------------
@@ -68,8 +68,12 @@ function instances()
                     <table class="lined">
                         <tr>
                             <th width="40%"><a href="instances.php?order_by=map&amp;start='.$start.'&amp;dir='.$dir.'"'.($order_by==='map' ? ' class="'.$order_dir.'"' : '').'>'.$lang_instances['map'].'</a></th>
-                            <th width="30%"><a href="instances.php?order_by=level_min&amp;start='.$start.'&amp;dir='.$dir.'"'.($order_by==='level_min' ? ' class="'.$order_dir.'"' : '').'>'.$lang_instances['level_min'].'</a></th>
-                            <th width="30%"><a href="instances.php?order_by=level_max&amp;start='.$start.'&amp;dir='.$dir.'"'.($order_by==='level_max' ? ' class="'.$order_dir.'"' : '').'>'.$lang_instances['level_max'].'</a></th>
+							<th width="10%"><a href="instances.php?order_by=mapid&amp;start='.$start.'&amp;dir='.$dir.'"'.($order_by==='mapid' ? ' class="'.$order_dir.'"' : '').'>'.$lang_instances['mapid'].'</a></th>
+                            <th width="10%"><a href="instances.php?order_by=level_min&amp;start='.$start.'&amp;dir='.$dir.'"'.($order_by==='level_min' ? ' class="'.$order_dir.'"' : '').'>'.$lang_instances['level_min'].'</a></th>
+                            <th width="10%"><a href="instances.php?order_by=level_max&amp;start='.$start.'&amp;dir='.$dir.'"'.($order_by==='level_max' ? ' class="'.$order_dir.'"' : '').'>'.$lang_instances['level_max'].'</a></th>
+							<th width="10%"><a href="instances.php?order_by=item_level&amp;start='.$start.'&amp;dir='.$dir.'"'.($order_by==='item_level' ? ' class="'.$order_dir.'"' : '').'>'.$lang_instances['item_level'].'</a></th>
+							<th width="10%"><a href="instances.php?order_by=quest_a&amp;start='.$start.'&amp;dir='.$dir.'"'.($order_by==='quest_a' ? ' class="'.$order_dir.'"' : '').'>'.$lang_instances['quest_a'].'</a></th>
+							<th width="10%"><a href="instances.php?order_by=quest_h&amp;start='.$start.'&amp;dir='.$dir.'"'.($order_by==='quest_h' ? ' class="'.$order_dir.'"' : '').'>'.$lang_instances['quest_h'].'</a></th>
                         </tr>';
 
     $sqlm = new SQL;
@@ -86,9 +90,13 @@ function instances()
                 $reset .= $hours.' hours';*/
         $output .= '
                         <tr valign="top">
-                            <td>'.get_map_name($instances['mapid'], $sqlm).' ('.$instances['mapid'].')</td>
+                            <td>'.$instances['map'].'</td>
+							<td>'.$instances['mapid'].'</td>
                             <td>'.$instances['level_min'].'</td>
                             <td>'.$instances['level_max'].'</td>
+							<td>'.$instances['item_level'].'</td>
+							<td>'.$instances['quest_a'].'</td>
+							<td>'.$instances['quest_h'].'</td>
                         </tr>';
     }
     //unset($reset);

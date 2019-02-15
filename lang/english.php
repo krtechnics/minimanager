@@ -2017,6 +2017,10 @@ function lang_instances()
     'instances' => 'Instances',
     'total' => 'Total',
     'map' => 'Map',
+	'mapid' => 'Map ID',
+	'item_level' => 'Item lvl',
+	'quest_a' => 'Quest A',
+	'quest_h' => 'Quest H',
     'level_min' => 'Minimum level',
     'level_max' => 'Maximum level',
   );
