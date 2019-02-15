@@ -43,7 +43,7 @@ $realm_db->query("SET NAMES $database_encoding");
 
 $gm_online = 0;
 $gm_accounts = array();
-$query = $realm_db->query("SELECT GROUP_CONCAT(`id` SEPARATOR ' ') FROM `account` WHERE `gmlevel`>'0'");
+$query = $realm_db->query("SELECT GROUP_CONCAT(`id` SEPARATOR ' ') FROM `account_access` WHERE `gmlevel`>'0'");
 if($query)
     if($result = $realm_db->fetch_row($query))
         $gm_accounts = explode(' ', $result[0]);
@@ -55,7 +55,7 @@ if(!$characters_db->isValid())
     exit();
 }
 $characters_db->query("SET NAMES $database_encoding");
-$query = $characters_db->query("SELECT `leaderGuid`,`memberGuid` FROM `group_member` WHERE `memberGuid` IN(SELECT `guid` FROM `characters` WHERE `online`='1')");
+$query = $characters_db->query("SELECT `groups`.`leaderGuid`, `group_member`.`memberGuid` FROM `groups` LEFT JOIN `group_member` ON `groups.`guid` = `group_member`.`guid` WHERE `memberGuid` IN(SELECT `guid` FROM `characters` WHERE `online`='1')");
 if($query)
     while($result = $characters_db->fetch_assoc($query))
         $groups[$result['memberGuid']] = $result['leaderGuid'];

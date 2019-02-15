@@ -8,11 +8,11 @@ class DBLayer
 
 	function DBLayer($db_host, $db_username, $db_password, $db_name)
 	{
-		$this->link_id = @mysql_connect($db_host, $db_username, $db_password, true);
+		$this->link_id = @mysqli_connect($db_host, $db_username, $db_password, $db_name);
 
 		if ($this->link_id)
 		{
-			if (@mysql_select_db($db_name, $this->link_id))
+			if (@mysqli_select_db($this->link_id, $db_name))
 				return $this->link_id;
 			else
             {
@@ -36,7 +36,7 @@ class DBLayer
         if(!$this->link_id)
             return false;
 
-		$this->query_result = @mysql_query($sql, $this->link_id);
+		$this->query_result = @mysqli_query($this->link_id, $sql);
 
 		if ($this->query_result)
 		{
@@ -50,39 +50,43 @@ class DBLayer
 	}
 
 
-	function result($query_id = 0, $row = 0)
-	{
-		return ($query_id) ? @mysql_result($query_id, $row) : false;
-	}
+	function result($query_id = 0, $row = 0, $field = NULL)
+    {
+        if ($query_id){
+            if ($row) @mysqli_data_seek($query_id, $row);
+            $cur_row = @mysqli_fetch_row($query_id);
+            return $cur_row[0];
+        } else return false;
+    }
 
 
 	function fetch_assoc($query_id = 0)
 	{
-		return ($query_id) ? @mysql_fetch_assoc($query_id) : false;
+		return ($query_id) ? @mysqli_fetch_assoc($query_id) : false;
 	}
 
 
 	function fetch_row($query_id = 0)
 	{
-		return ($query_id) ? @mysql_fetch_row($query_id) : false;
+		return ($query_id) ? @mysqli_fetch_row($query_id) : false;
 	}
 
 
 	function num_rows($query_id = 0)
 	{
-		return ($query_id) ? @mysql_num_rows($query_id) : false;
+		return ($query_id) ? @mysqli_num_rows($query_id) : false;
 	}
 
 
 	function affected_rows()
 	{
-		return ($this->link_id) ? @mysql_affected_rows($this->link_id) : false;
+		return ($this->link_id) ? @mysqli_affected_rows($this->link_id) : false;
 	}
 
 
 	function insert_id()
 	{
-		return ($this->link_id) ? @mysql_insert_id($this->link_id) : false;
+		return ($this->link_id) ? @mysqli_insert_id($this->link_id) : false;
 	}
 
 
@@ -100,14 +104,14 @@ class DBLayer
 
 	function free_result($query_id = false)
 	{
-		return ($query_id) ? @mysql_free_result($query_id) : false;
+		return ($query_id) ? @mysqli_free_result($query_id) : false;
 	}
 
 
 	function escape($str)
 	{
-		if (function_exists('mysql_real_escape_string'))
-			return mysql_real_escape_string($str, $this->link_id);
+		if (function_exists('mysqli_real_escape_string'))
+			return mysqli_real_escape_string($this->link_id, $str);
 		else
 			return mysql_escape_string($str);
 	}
@@ -116,8 +120,8 @@ class DBLayer
 	function error()
 	{
 		$result['error_sql'] = @current(@end($this->saved_queries));
-		$result['error_no'] = $this->link_id ? @mysql_errno($this->link_id) : @mysql_errno();
-		$result['error_msg'] = $this->link_id ? @mysql_error($this->link_id) : @mysql_error();
+		$result['error_no'] = $this->link_id ? @mysqli_errno($this->link_id) : @mysql_errno();
+		$result['error_msg'] = $this->link_id ? @mysqli_error($this->link_id) : @mysql_error();
 
 		return $result;
 	}
@@ -128,9 +132,9 @@ class DBLayer
 		if ($this->link_id)
 		{
 			if ($this->query_result)
-				@mysql_free_result($this->query_result);
+				@mysqli_free_result($this->query_result);
 
-			return @mysql_close($this->link_id);
+			return @mysqli_close($this->link_id);
 		}
 		else
 			return false;
