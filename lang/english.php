@@ -507,22 +507,22 @@ function lang_char()
     'achievement_date' => 'Date',
     // ---- char_mail.php ----
     'mail' => 'Mail',
-   // ---- char_rep.php ----
-  'Alliance' => 'Alliance',
-  'Horde' => 'Horde',
-  'Alliance Forces' => 'Alliance Forces',
-  'Horde Forces' => 'Horde Forces',
-  'Steamwheedle Cartel' => 'Steamwheedle Cartel',
-  'The Burning Crusade' => 'The Burning Crusade',
-  'Shattrath City' => 'Shattrath City',
-  'Alliance Vanguard' => 'Alliance Vanguard',
-  'Horde Expedition' => 'Horde Expedition',
-  'Sholazar Basin' => 'Sholazar Basin',
-  'Wrath of the Lich King' => 'Wrath of the Lich King',
-  'Other' => 'Other',
-  'Unknown' => 'Unknown',
-  );
-  return $lang_char;
+    // ---- char_rep.php ----
+   'Alliance' => 'Alliance',
+   'Horde' => 'Horde',
+   'Alliance Forces' => 'Alliance Forces',
+   'Horde Forces' => 'Horde Forces',
+   'Steamwheedle Cartel' => 'Steamwheedle Cartel',
+   'The Burning Crusade' => 'The Burning Crusade',
+   'Shattrath City' => 'Shattrath City',
+   'Alliance Vanguard' => 'Alliance Vanguard',
+   'Horde Expedition' => 'Horde Expedition',
+   'Sholazar Basin' => 'Sholazar Basin',
+   'Wrath of the Lich King' => 'Wrath of the Lich King',
+   'Other' => 'Other',
+   'Unknown' => 'Unknown',
+   );
+   return $lang_char;
 }
 
 
