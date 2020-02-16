@@ -28,7 +28,7 @@ function char_talent(&$sqlr, &$sqlc)
     {
         $char = $sqlc->fetch_assoc($result);
 
-        $owner_acc_id = $sqlc->result($result, 0, 'account');
+        $owner_acc_id = $char['account'];
         $result = $sqlr->query('SELECT `username`, `gmlevel` FROM `account` LEFT JOIN `account_access` ON `account`.`id`=`account_access`.`id` WHERE `account`.`id` = '.$owner_acc_id.' ORDER BY `gmlevel` DESC LIMIT 1');
         $owner_name = $sqlr->result($result, 0, 'username');
         $owner_gmlvl = $sqlr->result($result, 0, 'gmlevel');
