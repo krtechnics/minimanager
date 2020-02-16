@@ -60,7 +60,7 @@ function browse_users(&$sqlr, &$sqlc)
         // injection prevention
         $search_value = $sqlr->quote_smart($_GET['search_value']);
         $search_by = $sqlr->quote_smart($_GET['search_by']);
-        $search_menu = array('username', 'id', 'gmlevel', 'greater_gmlevel', 'email', 'joindate', 'last_ip', 'failed_logins', 'last_login', 'online', 'banned', 'locked', 'expansion');
+        $search_menu = array('username', 'id', 'gmlevel', 'greater_gmlevel', 'email', 'joindate', 'last_ip', 'failed_logins', 'greater_failed_logins', 'lesser_failed_logins', 'last_login', 'online', 'banned', 'locked', 'expansion');
         if (in_array($search_by, $search_menu));
         else
             $search_by = 'username';
@@ -94,8 +94,18 @@ function browse_users(&$sqlr, &$sqlc)
         }
         elseif ($search_by === 'failed_logins')
         {
+            $sql_query = 'SELECT `account_access`.`gmlevel`, `account`.`username`, `account`.`id`, `account`.`expansion`, `account`.`email`, `account`.`joindate`, `account`.`failed_logins`, `account`.`locked`, `account`.`last_login`, `account`.`online`, `account`.`last_ip` FROM account LEFT JOIN account_access ON account.id=account_access.id WHERE failed_logins = '.$search_value.' ORDER BY '.$order_by.' '.$order_dir.' LIMIT '.$start.', '.$itemperpage.'';
+            $query_1 = $sqlr->query('SELECT count(*) FROM account WHERE failed_logins = '.$search_value.'');
+        }
+        elseif ($search_by === 'greater_failed_logins')
+        {
             $sql_query = 'SELECT `account_access`.`gmlevel`, `account`.`username`, `account`.`id`, `account`.`expansion`, `account`.`email`, `account`.`joindate`, `account`.`failed_logins`, `account`.`locked`, `account`.`last_login`, `account`.`online`, `account`.`last_ip` FROM account LEFT JOIN account_access ON account.id=account_access.id WHERE failed_logins > '.$search_value.' ORDER BY '.$order_by.' '.$order_dir.' LIMIT '.$start.', '.$itemperpage.'';
             $query_1 = $sqlr->query('SELECT count(*) FROM account WHERE failed_logins > '.$search_value.'');
+        }
+        elseif ($search_by === 'lesser_failed_logins')
+        {
+            $sql_query = 'SELECT `account_access`.`gmlevel`, `account`.`username`, `account`.`id`, `account`.`expansion`, `account`.`email`, `account`.`joindate`, `account`.`failed_logins`, `account`.`locked`, `account`.`last_login`, `account`.`online`, `account`.`last_ip` FROM account LEFT JOIN account_access ON account.id=account_access.id WHERE failed_logins < '.$search_value.' ORDER BY '.$order_by.' '.$order_dir.' LIMIT '.$start.', '.$itemperpage.'';
+            $query_1 = $sqlr->query('SELECT count(*) FROM account WHERE failed_logins < '.$search_value.'');
         }
         else
         {
@@ -170,6 +180,8 @@ function browse_users(&$sqlr, &$sqlc)
                                                     <option value="joindate"'.($search_by === 'joindate' ? ' selected="selected"' : '').'>'.$lang_user['by_join_date'].'</option>
                                                     <option value="last_ip"'.($search_by === 'last_ip' ? ' selected="selected"' : '').'>'.$lang_user['by_ip'].'</option>
                                                     <option value="failed_logins"'.($search_by === 'failed_logins' ? ' selected="selected"' : '').'>'.$lang_user['by_failed_loggins'].'</option>
+                                                    <option value="greater_failed_logins"'.($search_by === 'greater_failed_logins' ? ' selected="selected"' : '').'>'.$lang_user['by_greater_failed_loggins'].'</option>
+                                                    <option value="lesser_failed_logins"'.($search_by === 'lesser_failed_logins' ? ' selected="selected"' : '').'>'.$lang_user['by_lesser_failed_loggins'].'</option>
                                                     <option value="last_login"'.($search_by === 'last_login' ? ' selected="selected"' : '').'>'.$lang_user['by_last_login'].'</option>
                                                     <option value="online"'.($search_by === 'online' ? ' selected="selected"' : '').'>'.$lang_user['by_online'].'</option>
                                                     <option value="locked"'.($search_by === 'locked' ? ' selected="selected"' : '').'>'.$lang_user['by_locked'].'</option>
