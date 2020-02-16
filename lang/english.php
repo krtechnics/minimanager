@@ -740,6 +740,7 @@ function lang_char_list()
   'del_selected_chars' => 'Delete Checked Character(s)',
   'greater_honor_kills' => '&lt; H.Kills',
   'greater_level' => '&gt; Level',
+  'lesser_level' => '&lt; Level',
   'guild' => 'Guild',
   'honor_kills' => 'H.K',
   'id' => 'ID',

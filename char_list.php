@@ -49,7 +49,7 @@ function browse_chars(&$sqlr, &$sqlc)
     {
         $search_value = $sqlr->quote_smart($_GET['search_value']);
         $search_by = (isset($_GET['search_by'])) ? $sqlr->quote_smart($_GET['search_by']) : 'name';
-        $search_menu = array('name', 'guid', 'account', 'level', 'greater_level', 'guild', 'race', 'class', 'map', 'greater_rank', 'online', 'gold', 'item');
+        $search_menu = array('name', 'guid', 'account', 'level', 'greater_level', 'lesser_level', 'guild', 'race', 'class', 'map', 'greater_rank', 'online', 'gold', 'item');
 
         if (in_array($search_by, $search_menu));
         else
@@ -90,6 +90,14 @@ function browse_chars(&$sqlr, &$sqlc)
                     $search_value = 1;
 
                 $where_out ="characters.level > $search_value";
+                break;
+
+            case "lesser_level":
+                if (is_numeric($search_value));
+                else
+                    $search_value = 1;
+
+                $where_out ="characters.level < $search_value";
                 break;
 
             case "gold":
@@ -214,6 +222,7 @@ function browse_chars(&$sqlr, &$sqlc)
                                                         <option value=\"account\"".($search_by == 'account' ? " selected=\"selected\"" : "").">{$lang_char_list['by_account']}</option>
                                                         <option value=\"level\"".($search_by == 'level' ? " selected=\"selected\"" : "").">{$lang_char_list['by_level']}</option>
                                                         <option value=\"greater_level\"".($search_by == 'greater_level' ? " selected=\"selected\"" : "").">{$lang_char_list['greater_level']}</option>
+                                                        <option value=\"lesser_level\"".($search_by == 'lesser_level' ? " selected=\"selected\"" : "").">{$lang_char_list['lesser_level']}</option>
                                                         <option value=\"guild\"".($search_by == 'guild' ? " selected=\"selected\"" : "").">{$lang_char_list['by_guild']}</option>
                                                         <option value=\"race\"".($search_by == 'race' ? " selected=\"selected\"" : "").">{$lang_char_list['by_race_id']}</option>
                                                         <option value=\"class\"".($search_by == 'class' ? " selected=\"selected\"" : "").">{$lang_char_list['by_class_id']}</option>
