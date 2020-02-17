@@ -266,7 +266,7 @@ function char_main(&$sqlr, &$sqlc)
                                         </a>';
             else
                 $output .= '
-                                        <img src="img/INV/INV_empty_head.png" class="icon_border_0" alt="empty" />';
+                                        <img src="img/INV/INV_empty_head.png" class="icon_border" alt="empty" />';
             $output .= '
                                     </td>
                                     <td class="half_line" colspan="2" align="center" width="50%">
@@ -318,7 +318,7 @@ function char_main(&$sqlr, &$sqlc)
                                         </a>';
             else
                 $output .= '
-                                        <img src="img/INV/INV_empty_gloves.png" class="icon_border_0" alt="empty" />';
+                                        <img src="img/INV/INV_empty_gloves.png" class="icon_border" alt="empty" />';
             $output .= '
                                     </td>
                                 </tr>
@@ -331,7 +331,7 @@ function char_main(&$sqlr, &$sqlc)
                                         </a>';
             else
                 $output .= '
-                                        <img src="img/INV/INV_empty_neck.png" class="icon_border_0" alt="empty" />';
+                                        <img src="img/INV/INV_empty_neck.png" class="icon_border" alt="empty" />';
             $output .= '
                                     </td>
                                     <td class="half_line" colspan="2" rowspan="3" align="center" width="50%">
@@ -378,7 +378,7 @@ function char_main(&$sqlr, &$sqlc)
                                         </a>';
             else
                 $output .= '
-                                        <img src="img/INV/INV_empty_waist.png" class="icon_border_0" alt="empty" />';
+                                        <img src="img/INV/INV_empty_waist.png" class="icon_border" alt="empty" />';
             $output .= '
                                     </td>
                                 </tr>
@@ -391,7 +391,7 @@ function char_main(&$sqlr, &$sqlc)
                                         </a>';
             else
                 $output .= '
-                                        <img src="img/INV/INV_empty_shoulder.png" class="icon_border_0" alt="empty" />';
+                                        <img src="img/INV/INV_empty_shoulder.png" class="icon_border" alt="empty" />';
             $output .= '
                                     </td>
                                     <td width="1%">';
@@ -402,7 +402,7 @@ function char_main(&$sqlr, &$sqlc)
                                         </a>';
             else
                 $output .= '
-                                        <img src="img/INV/INV_empty_legs.png" class="icon_border_0" alt="empty" />';
+                                        <img src="img/INV/INV_empty_legs.png" class="icon_border" alt="empty" />';
             $output .= '
                                     </td>
                                 </tr>
@@ -415,7 +415,7 @@ function char_main(&$sqlr, &$sqlc)
                                         </a>';
             else
                 $output .= '
-                                        <img src="img/INV/INV_empty_chest_back.png" class="icon_border_0" alt="empty" />';
+                                        <img src="img/INV/INV_empty_chest_back.png" class="icon_border" alt="empty" />';
             $output .= '
                                     </td>
                                     <td width="1%">';
@@ -426,7 +426,7 @@ function char_main(&$sqlr, &$sqlc)
                                         </a>';
             else
                 $output .= '
-                                        <img src="img/INV/INV_empty_feet.png" class="icon_border_0" alt="empty" />';
+                                        <img src="img/INV/INV_empty_feet.png" class="icon_border" alt="empty" />';
             $output .= '
                                     </td>
                                 </tr>
@@ -439,7 +439,7 @@ function char_main(&$sqlr, &$sqlc)
                                         </a>';
             else
                 $output .= '
-                                        <img src="img/INV/INV_empty_chest_back.png" class="icon_border_0" alt="empty" />';
+                                        <img src="img/INV/INV_empty_chest_back.png" class="icon_border" alt="empty" />';
                 $output .= '
                                     </td>
                                     <td class="half_line" colspan="2" rowspan="2" align="center" width="50%">
@@ -482,7 +482,7 @@ function char_main(&$sqlr, &$sqlc)
                                         </a>';
             else
                 $output .= '
-                                        <img src="img/INV/INV_empty_finger.png" class="icon_border_0" alt="empty" />';
+                                        <img src="img/INV/INV_empty_finger.png" class="icon_border" alt="empty" />';
             $output .= '
                                     </td>
                                 </tr>
@@ -495,7 +495,7 @@ function char_main(&$sqlr, &$sqlc)
                                         </a>';
             else
                 $output .= '
-                                        <img src="img/INV/INV_empty_shirt.png" class="icon_border_0" alt="empty" />';
+                                        <img src="img/INV/INV_empty_shirt.png" class="icon_border" alt="empty" />';
             $output .= '
                                     </td>
                                     <td width="1%">';
@@ -506,7 +506,7 @@ function char_main(&$sqlr, &$sqlc)
                                         </a>';
             else
                 $output .= '
-                                        <img src="img/INV/INV_empty_finger.png" class="icon_border_0" alt="empty" />';
+                                        <img src="img/INV/INV_empty_finger.png" class="icon_border" alt="empty" />';
             $output .= '
                                     </td>
                                 </tr>
@@ -519,7 +519,7 @@ function char_main(&$sqlr, &$sqlc)
                                         </a>';
             else
                 $output .= '
-                                        <img src="img/INV/INV_empty_tabard.png" class="icon_border_0" alt="empty" />';
+                                        <img src="img/INV/INV_empty_tabard.png" class="icon_border" alt="empty" />';
             $output .= '
                                     </td>
                                     <td class="half_line" colspan="2" rowspan="2" align="center" width="50%">
@@ -558,7 +558,7 @@ function char_main(&$sqlr, &$sqlc)
                                         </a>';
             else
                 $output .= '
-                                        <img src="img/INV/INV_empty_trinket.png" class="icon_border_0" alt="empty" />';
+                                        <img src="img/INV/INV_empty_trinket.png" class="icon_border" alt="empty" />';
             $output .= '
                                     </td>
                                 </tr>
@@ -571,7 +571,7 @@ function char_main(&$sqlr, &$sqlc)
                                         </a>';
             else
                 $output .= '
-                                        <img src="img/INV/INV_empty_wrist.png" class="icon_border_0" alt="empty" />';
+                                        <img src="img/INV/INV_empty_wrist.png" class="icon_border" alt="empty" />';
             $output .= '
                                     </td>
                                     <td width="1%">';
@@ -582,7 +582,7 @@ function char_main(&$sqlr, &$sqlc)
                                         </a>';
             else
                 $output .= '
-                                        <img src="img/INV/INV_empty_trinket.png" class="icon_border_0" alt="empty" />';
+                                        <img src="img/INV/INV_empty_trinket.png" class="icon_border" alt="empty" />';
             $output .= '
                                     </td>
                                 </tr>
@@ -596,7 +596,7 @@ function char_main(&$sqlr, &$sqlc)
                                         </a>';
             else
                 $output .= '
-                                        <img src="img/INV/INV_empty_main_hand.png" class="icon_border_0" alt="empty" />';
+                                        <img src="img/INV/INV_empty_main_hand.png" class="icon_border" alt="empty" />';
             $output .= '
                                     </td>
                                     <td width="15%">';
@@ -607,7 +607,7 @@ function char_main(&$sqlr, &$sqlc)
                                         </a>';
             else
                 $output .= '
-                                        <img src="img/INV/INV_empty_off_hand.png" class="icon_border_0" alt="empty" />';
+                                        <img src="img/INV/INV_empty_off_hand.png" class="icon_border" alt="empty" />';
             $output .= '
                                     </td>
                                     <td width="15%">';
@@ -618,7 +618,7 @@ function char_main(&$sqlr, &$sqlc)
                                         </a>';
         else
             $output .= '
-                                        <img src="img/INV/INV_empty_ranged.png" class="icon_border_0" alt="empty" />';
+                                        <img src="img/INV/INV_empty_ranged.png" class="icon_border" alt="empty" />';
         $output .= '
                                     </td>
                                     <td width="15%"></td>

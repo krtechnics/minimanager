@@ -497,6 +497,14 @@ i.br {
 	padding: 6px;
 }
 
+.icon_border {
+	border: 0px;
+	padding: 6px;
+	width: 32px;
+	height: 32px;
+	background: url(../../img/INV/icon_border.png)
+}
+
 .icon_border_0 {
 	border: 0px;
 	padding: 6px;
@@ -551,6 +559,14 @@ i.br {
 	width: 32px;
 	height: 32px;
 	background: url(../../img/INV/icon_border_6.png)
+}
+
+.icon_border_7 {
+	border: 0px;
+	padding: 6px;
+	width: 32px;
+	height: 32px;
+	background: url(../../img/INV/icon_border_7.png)
 }
 
 /*** graphs and bars ***/
