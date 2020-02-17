@@ -279,12 +279,13 @@ function browse_chars(&$sqlr, &$sqlc)
         $char = $sqlr->fetch_row($query) or die(error($lang_global['err_no_user']));
         // to disalow lower lvl gm to  view accounts of other gms
         $result = $sqlr->query("SELECT `account_access`.`gmlevel`, `account`.`username` FROM account LEFT JOIN account_access ON account.id=account_access.id WHERE account.id ='$char[2]'");
-        $owner_gmlvl = $sqlr->result($result, 0, 'gmlevel');
+        $acc = $sqlr->fetch_assoc($result);
+        $owner_gmlvl = $acc['gmlevel'];
 
         if ($owner_gmlvl == null)
             $owner_gmlvl = 0;
 
-        $owner_acc_name = $sqlr->result($result, 0, 'username');
+        $owner_acc_name = $acc['username'];
         $lastseen = date('Y-m-d G:i:s', $char[10]);
 
         $guild_name = $sqlc->fetch_row($sqlc->query('SELECT BINARY name AS name FROM guild WHERE guildid = '.$char[11].''));
