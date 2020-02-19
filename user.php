@@ -269,7 +269,7 @@ function browse_users(&$sqlr, &$sqlc)
                                 <td class="small">'.$data['joindate'].'</td>';
             if (($user_lvl >= $action_permission['update'])||($user_name === $data['username']))
                 $output .= '
-                                <td>'.$data['last_ip'].'</td>';
+                                <td><a href="https://www.ip2location.com/demo/'.$data['last_ip'].'" target="_blank" rel="noopener noreferrer">'.$data['last_ip'].'</a></td>';
             else
                 $output .= '
                                 <td>*******</td>';
@@ -906,7 +906,8 @@ function edit_user()
          if($user_lvl >= $action_permission['update'])
          {
              $output .= '
-                                         <td>'.$data['last_ip'].'';
+                                        <td><a href="https://www.ip2location.com/demo/'.$data['last_ip'].'" target="_blank" rel="noopener noreferrer">'.$data['last_ip'].'</a>';
+
                                              if ($showcountryflag)
                                              {
                                                  $country = misc_get_country_by_ip($data['last_ip'], $sqlm);
