@@ -315,7 +315,7 @@ function browse_chars(&$sqlr, &$sqlc)
             {
                 $country = misc_get_country_by_account($char[2], $sqlr, $sqlm);
                 $output .= "
-                                <td>".(($country['code']) ? "<img src='img/flags/".$country['code'].".png' onmousemove='toolTip(\"".($country['country'])."\",\"item_tooltip\")' onmouseout='toolTip()' alt=\"\" />" : "-")."</td>";
+                                <td>".((ctype_alpha($country['code'])) ? "<img src='img/flags/".$country['code'].".png' onmousemove='toolTip(\"".($country['country'])."\",\"item_tooltip\")' onmouseout='toolTip()' alt=\"\" />" : "-")."</td>";
             }
             $output .= '
                             </tr>';
