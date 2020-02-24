@@ -754,6 +754,7 @@ function lang_char_list()
   'tot_chars' => 'Total Characters',
   'total' => 'Total',
   'zone' => 'Zone',
+  'amount' => 'Amount',
   );
   return $lang_char_list;
 }

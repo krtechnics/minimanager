@@ -173,7 +173,15 @@ function browse_chars(&$sqlr, &$sqlc)
 
                     $where_out ="characters.".$search_by." LIKE '%".$search_value."%'";
         }
-        $sql_query = "SELECT characters.guid, BINARY characters.name AS name, characters.account, characters.race, characters.class, characters.zone, characters.map, characters.online, characters.level, characters.gender, characters.logout_time, COALESCE(guild_member.guildid,0) AS gname FROM characters LEFT JOIN guild_member ON characters.guid = guild_member.guid WHERE $where_out AND name != '' ORDER BY $order_by $order_dir LIMIT $start, $itemperpage";
+
+        if ($search_by === "item")
+        {
+            $sql_query = "SELECT characters.guid, BINARY characters.name AS name, characters.account, characters.race, characters.class, characters.zone, characters.map, characters.online, characters.level, characters.gender, characters.logout_time, COALESCE(guild_member.guildid,0) AS gname, SUM(item_instance.count) as amount FROM characters LEFT JOIN guild_member ON characters.guid = guild_member.guid LEFT JOIN item_instance on characters.guid = item_instance.owner_guid WHERE $where_out AND itemEntry = $search_value AND name != '' GROUP BY guid ORDER BY $order_by $order_dir LIMIT $start, $itemperpage";
+        }
+        else
+        {
+            $sql_query = "SELECT characters.guid, BINARY characters.name AS name, characters.account, characters.race, characters.class, characters.zone, characters.map, characters.online, characters.level, characters.gender, characters.logout_time, COALESCE(guild_member.guildid,0) AS gname FROM characters LEFT JOIN guild_member ON characters.guid = guild_member.guid WHERE $where_out AND name != '' ORDER BY $order_by $order_dir LIMIT $start, $itemperpage";
+        }
 
         $query_1 = $sqlc->query("SELECT count(*) FROM `characters` where $where_out");
         $query = $sqlc->query($sql_query);
@@ -252,7 +260,14 @@ function browse_chars(&$sqlr, &$sqlc)
                                 <th width=\"1%\"><input name=\"allbox\" type=\"checkbox\" value=\"Check All\" onclick=\"CheckAll(document.form1);\" /></th>
                                 <th width=\"1%\"><a href=\"char_list.php?order_by=guid&amp;start=$start".( $search_value && $search_by ? "&amp;search_by=$search_by&amp;search_value=$search_value" : "" )."&amp;dir=$dir\">".($order_by=='guid' ? "<img src=\"img/arr_".($dir ? "up" : "dw").".gif\" alt=\"\" /> " : "")."{$lang_char_list['id']}</a></th>
                                 <th width=\"1%\"><a href=\"char_list.php?order_by=name&amp;start=$start".( $search_value && $search_by ? "&amp;search_by=$search_by&amp;search_value=$search_value" : "" )."&amp;dir=$dir\">".($order_by=='name' ? "<img src=\"img/arr_".($dir ? "up" : "dw").".gif\" alt=\"\" /> " : "")."{$lang_char_list['char_name']}</a></th>
-                                <th width=\"1%\"><a href=\"char_list.php?order_by=account&amp;start=$start".( $search_value && $search_by ? "&amp;search_by=$search_by&amp;search_value=$search_value" : "" )."&amp;dir=$dir\">".($order_by=='account' ? "<img src=\"img/arr_".($dir ? "up" : "dw").".gif\" alt=\"\" /> " : "")."{$lang_char_list['account']}</a></th>
+                                <th width=\"1%\"><a href=\"char_list.php?order_by=account&amp;start=$start".( $search_value && $search_by ? "&amp;search_by=$search_by&amp;search_value=$search_value" : "" )."&amp;dir=$dir\">".($order_by=='account' ? "<img src=\"img/arr_".($dir ? "up" : "dw").".gif\" alt=\"\" /> " : "")."{$lang_char_list['account']}</a></th>";
+
+    if ($search_by === "item")
+    {
+        $output .= "
+                                <th width=\"1%\"><a href=\"char_list.php?order_by=amount&amp;start=$start".( $search_value && $search_by ? "&amp;search_by=$search_by&amp;search_value=$search_value" : "" )."&amp;dir=$dir\">".($order_by=='amount' ? "<img src=\"img/arr_".($dir ? "up" : "dw").".gif\" alt=\"\" /> " : "")."{$lang_char_list['amount']}</a></th>";
+    }
+    $output .= "
                                 <th width=\"1%\"><a href=\"char_list.php?order_by=race&amp;start=$start".( $search_value && $search_by ? "&amp;search_by=$search_by&amp;search_value=$search_value" : "" )."&amp;dir=$dir\">".($order_by=='race' ? "<img src=\"img/arr_".($dir ? "up" : "dw").".gif\" alt=\"\" /> " : "")."{$lang_char_list['race']}</a></th>
                                 <th width=\"1%\"><a href=\"char_list.php?order_by=class&amp;start=$start".( $search_value && $search_by ? "&amp;search_by=$search_by&amp;search_value=$search_value" : "" )."&amp;dir=$dir\">".($order_by=='class' ? "<img src=\"img/arr_".($dir ? "up" : "dw").".gif\" alt=\"\" /> " : "")."{$lang_char_list['class']}</a></th>
                                 <th width=\"1%\"><a href=\"char_list.php?order_by=level&amp;start=$start".( $search_value && $search_by ? "&amp;search_by=$search_by&amp;search_value=$search_value" : "" )."&amp;dir=$dir\">".($order_by=='level' ? "<img src=\"img/arr_".($dir ? "up" : "dw").".gif\" alt=\"\" /> " : "")."{$lang_char_list['level']}</a></th>
@@ -302,7 +317,14 @@ function browse_chars(&$sqlr, &$sqlc)
                                 </td>
                                 <td>$char[0]</td>
                                 <td><a href=\"char.php?id=$char[0]\">".htmlentities($char[1])."</a></td>
-                                <td><a href=\"user.php?action=edit_user&amp;error=11&amp;id=$char[2]\">".htmlentities($owner_acc_name)."</a></td>
+                                <td><a href=\"user.php?action=edit_user&amp;error=11&amp;id=$char[2]\">".htmlentities($owner_acc_name)."</a></td>";
+
+            if ($search_by === "item")
+            {
+                $output .= "
+                                <td>$char[12]</td>";
+            }
+            $output .= "
                                 <td><img src='img/c_icons/{$char[3]}-{$char[9]}.gif' onmousemove='toolTip(\"".char_get_race_name($char[3])."\",\"item_tooltip\")' onmouseout='toolTip()' alt=\"\" /></td>
                                 <td><img src='img/c_icons/{$char[4]}.gif' onmousemove='toolTip(\"".char_get_class_name($char[4])."\",\"item_tooltip\")' onmouseout='toolTip()' alt=\"\" /></td>
                                 <td>".char_get_level_color($char[8])."</td>
