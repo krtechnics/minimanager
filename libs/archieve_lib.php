@@ -99,14 +99,18 @@ function achieve_get_details($id, &$sqlm)
 
 function achieve_get_icon($achieveid, &$sqlm)
 {
-    global $tooltip_url, $item_icons;
+    global $item_icons;
 
     $result = $sqlm->query('SELECT field_42 FROM dbc_achievement WHERE id = \''.$achieveid.'\' LIMIT 1');
 
     if ($result)
+    {
         $displayid = $sqlm->result($result, 0);
+    }
     else
+    {
         $displayid = 0;
+    }
 
     if ($displayid)
     {
@@ -118,14 +122,24 @@ function achieve_get_icon($achieveid, &$sqlm)
             $achieve = strtolower($achieve_uppercase);
             $achieve_icon = substr($achieve, 16);
 
-            if ($achieve_icon)
+            if ($achieve_icon && file_exists(''.$item_icons.'/'.$achieve_icon.'.jpg'))
             {
-                return ''.$tooltip_url.'/static/images/wow/icons/medium/'.$achieve_icon.'.jpg';
+                return ''.$item_icons .'/'.$achieve_icon.'.jpg';
             }
+            else
+            {
+                return ''.$item_icons .'/inv_misc_questionmark.jpg';
+            }
+        }
+        else
+        {
+            return ''.$item_icons .'/inv_misc_questionmark.jpg';
         }
     }
     else
-        return 'img/INV/INV_blank_32.gif';
+    {
+        return ''.$item_icons .'/inv_misc_questionmark.jpg';
+    }
 }
 
 ?>
