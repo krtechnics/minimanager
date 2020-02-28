@@ -95,11 +95,11 @@ function achieve_get_details($id, &$sqlm)
 
 
 //#############################################################################
-//get achievement icon - if icon not exists in item_icons folder D/L it from web.
+//get achievement icon
 
 function achieve_get_icon($achieveid, &$sqlm)
 {
-    global $proxy_cfg, $get_icons_from_web, $item_icons;
+    global $tooltip_url, $item_icons;
 
     $result = $sqlm->query('SELECT field_42 FROM dbc_achievement WHERE id = \''.$achieveid.'\' LIMIT 1');
 
@@ -116,161 +116,16 @@ function achieve_get_icon($achieveid, &$sqlm)
         {
             $achieve_uppercase = $sqlm->result($result, 0);
             $achieve = strtolower($achieve_uppercase);
+            $achieve_icon = substr($achieve, 16);
 
-            if ($achieve)
+            if ($achieve_icon)
             {
-                if (file_exists(''.$item_icons.'/'.$achieve.'.jpg'))
-                {
-                    if (filesize(''.$item_icons.'/'.$achieve.'.jpg') > 349)
-                    {
-                        return ''.$item_icons.'/'.$achieve.'.jpg';
-                    }
-                    else
-                    {
-                        $sqlm->query('DELETE FROM dbc_spellicon WHERE id = '.$displayid.'');
-                        if (file_exists(''.$item_icons.'/'.$achieve.'.jpg'))
-                            unlink(''.$item_icons.'/'.$achieve.'.jpg');
-                        $achieve = '';
-                    }
-                }
-                else
-                    $achieve = '';
-            }
-            else
-                $achieve = '';
-        }
-        else
-            $achieve = '';
-    }
-    else
-        $achieve = '';
-
-    if($get_icons_from_web)
-    {
-        $xmlfilepath='https://www.wowhead.com/achievement=';
-        $proxy = $proxy_cfg['addr'];
-        $port = $proxy_cfg['port'];
-
-        if (empty($proxy_cfg['addr']))
-        {
-            $proxy = 'www.wowhead.com';
-            $xmlfilepath = 'achievement=';
-            $port = 80;
-        }
-
-        if ($achieve == '')
-        {
-            //get the icon name
-            $fp = @fsockopen($proxy, $port, $errno, $errstr, 0.5);
-            if ($fp);
-            else
-                return 'img/INV/INV_blank_32.gif';
-                
-            $out = "GET /$xmlfilepath$achieveid HTTP/1.0\r\nHost: www.wowhead.com\r\n";
-            if (isset($proxy_cfg['user']))
-                $out .= "Proxy-Authorization: Basic ". base64_encode ("{$proxy_cfg['user']}:{$proxy_cfg['pass']}")."\r\n";
-            $out .="Connection: Close\r\n\r\n";
-
-            $temp = '';
-            fwrite($fp, $out);
-            while ($fp && !feof($fp))
-                $temp .= fgets($fp, 4096);
-                
-            fclose($fp);
-
-            $wowhead_string = $temp;
-            $temp_string1 = strstr($wowhead_string, 'Icon.create(');
-            $temp_string2 = substr($temp_string1, 12, 50);
-            $temp_string3 = strtok($temp_string2, ',');
-            $temp_string4 = substr($temp_string3, 1, strlen($temp_string3) - 2);
-            $achieve_icon_name = $temp_string4;
-
-            $achieve_uppercase = $achieve_icon_name;
-            $achieve = strtolower($achieve_uppercase);
-        }
-
-        if (file_exists(''.$item_icons.'/'.$achieve.'.jpg'))
-        {
-            if (filesize(''.$item_icons.'/'.$achieve.'.jpg') > 349)
-            {
-                $sqlm->query('REPLACE INTO dbc_spellicon (id, field_1) VALUES (\''.$displayid.'\', \''.$achieve.'\')');
-                return ''.$item_icons.'/'.$achieve.'.jpg';
-            }
-            else
-            {
-                $sqlm->query('DELETE FROM dbc_spellicon WHERE id = '.$displayid.'');
-                if (file_exists(''.$item_icons.'/'.$achieve.'.jpg'))
-                    unlink(''.$item_icons.'/'.$achieve.'.jpg');
+                return ''.$tooltip_url.'/static/images/wow/icons/medium/'.$achieve_icon.'.jpg';
             }
         }
-
-        //get the icon itself
-        if (empty($proxy_cfg['addr']))
-        {
-            $proxy = 'static.wowhead.com';
-            $port = 80;
-        }
-        $fp = @fsockopen($proxy, $port, $errno, $errstr, 0.5);
-        if ($fp);
-        else
-            return 'img/INV/INV_blank_32.gif';
-        $iconfilename = strtolower($achieve);
-        $file = 'https://static.wowhead.com/images/icons/medium/'.$iconfilename.'.jpg';
-        $out = "GET $file HTTP/1.0\r\nHost: static.wowhead.com\r\n";
-        if (isset($proxy_cfg['user']))
-            $out .= "Proxy-Authorization: Basic ". base64_encode ("{$proxy_cfg['user']}:{$proxy_cfg['pass']}")."\r\n";
-        $out .="Connection: Close\r\n\r\n";
-        fwrite($fp, $out);
-
-        //remove header
-        while ($fp && !feof($fp))
-        {
-            $headerbuffer = fgets($fp, 4096);
-            if (urlencode($headerbuffer) == '%0D%0A')
-                break;
-        }
-
-        if (file_exists(''.$item_icons.'/'.$achieve.'.jpg'))
-        {
-            if (filesize(''.$item_icons.'/'.$achieve.'.jpg') > 349)
-            {
-                $sqlm->query('REPLACE INTO dbc_spellicon (id, field_1) VALUES (\''.$displayid.'\', \''.$achieve.'\')');
-                return ''.$item_icons.'/'.$achieve.'.jpg';
-            }
-            else
-            {
-                $sqlm->query('DELETE FROM dbc_spellicon WHERE id = '.$displayid.'');
-                if (file_exists(''.$item_icons.'/'.$achieve.'.jpg'))
-                    unlink(''.$item_icons.'/'.$achieve.'.jpg');
-            }
-        }
-
-        $img_file = fopen(''.$item_icons.'/'.$achieve.'.jpg', 'wb');
-        while (!feof($fp))
-            fwrite($img_file,fgets($fp, 4096));
-        fclose($fp);
-        fclose($img_file);
-
-        if (file_exists(''.$item_icons.'/'.$achieve.'.jpg'))
-        {
-            if (filesize(''.$item_icons.'/'.$achieve.'.jpg') > 349)
-            {
-                $sqlm->query('REPLACE INTO dbc_spellicon (id, field_1) VALUES (\''.$displayid.'\', \''.$achieve.'\')');
-                return ''.$item_icons.'/'.$achieve.'.jpg';
-            }
-            else
-            {
-                $sqlm->query('DELETE FROM dbc_spellicon WHERE id = '.$displayid.'');
-                if (file_exists(''.$item_icons.'/'.$achieve.'.jpg'))
-                    unlink(''.$item_icons.'/'.$achieve.'.jpg');
-            }
-        }
-        else
-            return 'img/INV/INV_blank_32.gif';
     }
     else
         return 'img/INV/INV_blank_32.gif';
 }
-
 
 ?>
