@@ -259,12 +259,12 @@ function search()
 function do_search()
 {
     global $lang_global, $lang_item, $lang_item_edit, $output, $world_db, $realm_id, $item_datasite, $sql_search_limit, $itemperpage,
-        $action_permission, $user_lvl;
+        $action_permission, $user_lvl, $sqlm;
 
     valid_login($action_permission['read']);
     wowhead_tt();
 
-    $deplang = get_lang_id();
+    $deplang = get_localestr_by_lang_cookie();
     if (($_POST['class'] == "-1")&&($_POST['Quality'] == "-1")&&($_POST['InventoryType'] == "-1")&&($_POST['bonding'] == "-1")
         &&(!isset($_POST['entry'])||$_POST['entry'] === '')&&(!isset($_POST['name'])||$_POST['name'] === '')&&(!isset($_POST['displayid'])||$_POST['displayid'] === '')&&(!isset($_POST['RequiredLevel'])||$_POST['RequiredLevel'] === '')
         &&(!isset($_POST['spellid_1'])||$_POST['spellid_1'] === '')&&(!isset($_POST['spellid_2'])||$_POST['spellid_2'] === '')&&(!isset($_POST['spellid_3'])||$_POST['spellid_3'] === '')&&(!isset($_POST['spellid_4'])||$_POST['spellid_4'] === '')
@@ -302,7 +302,7 @@ function do_search()
     if($bonding != "-1")       $where .= "AND bonding = '$bonding' ";
 
     if(isset($entry))         $where .= "AND item_template.entry = '$entry' ";
-    if(isset($name))          $where .= "AND IFNULL(".($deplang<>0?"name_loc$deplang":"NULL").",`name`) LIKE '%$name%' ";
+    if(isset($name))          $where .= "AND COALESCE(item_template_locale.Name, item_template.name) LIKE '%$name%'";
     if(isset($displayid))     $where .= "AND displayid = '$displayid' ";
     if(isset($RequiredLevel)) $where .= "AND RequiredLevel = '$RequiredLevel' ";
 
@@ -317,7 +317,7 @@ function do_search()
 
     if($where == "WHERE item_template.entry > 0 ") redirect("item.php?error=1");
 
-    $result = $sqlw->query("SELECT item_template.entry,displayid,IFNULL(".($deplang<>0?"name_loc$deplang":"NULL").",`name`) as name,RequiredLevel,ItemLevel FROM item_template LEFT JOIN locales_item ON item_template.entry = locales_item.entry $where ORDER BY item_template.entry LIMIT $sql_search_limit");
+    $result = $sqlw->query("SELECT item_template.entry,displayid,COALESCE(item_template_locale.Name, item_template.name) as name,RequiredLevel,ItemLevel FROM item_template LEFT JOIN item_template_locale ON (item_template.entry = item_template_locale.ID AND item_template_locale.locale = '$deplang') $where ORDER BY item_template.entry LIMIT $sql_search_limit");
     $total_items_found = $sqlw->num_rows($result);
 
     $output .= "
@@ -352,7 +352,7 @@ function do_search()
                             <td><a href=\"$item_datasite$item[0]\" target=\"_blank\">$item[0]</a></td>
                             <td>
                                 <a style=\"padding:2px;\" href=\"$item_datasite$item[0]\" target=\"_blank\">
-                                    <img src=\"".get_item_icon($item[0])."\" class=\"".get_item_border($item[0], $sqlw)."\" alt=\"\" />
+                                    <img src=\"".get_item_icon($item[0], $sqlm, $sqlw)."\" class=\"".get_item_border($item[0], $sqlw)."\" alt=\"\" />
                                 </a>
                             </td>
                             <td>
