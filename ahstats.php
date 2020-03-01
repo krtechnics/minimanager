@@ -8,7 +8,7 @@ valid_login($action_permission['read']);
 //#############################################################################
 // BROWSE AUCTIONS
 //#############################################################################
-function browse_auctions(&$sqlr, &$sqlc)
+function browse_auctions(SQL &$sqlr, SQL &$sqlc)
 {
     global $lang_auctionhouse, $lang_global, $lang_item, $output, $characters_db, $world_db, $realm_id, $itemperpage, $item_datasite, $server, $user_lvl, $user_id;
     wowhead_tt();
@@ -161,7 +161,7 @@ function browse_auctions(&$sqlr, &$sqlc)
         $query_1 = $sqlc->query("SELECT count(*) FROM auctionhouse");
     }
 
-    $result = $sqlc->query("SELECT BINARY `characters`.`name` AS `seller`, `item_instance`.`itemEntry` AS `itemid`, `item_template`.`name` AS `itemname`, `auctionhouse`.`buyoutprice` AS `buyout`, `auctionhouse`.`time`-unix_timestamp(), BINARY `c2`.`name` AS `encherisseur`, `auctionhouse`.`lastbid`, `auctionhouse`.`startbid`, `item_instance`.`count` AS qty, `characters`.`race` AS seller_race, `c2`.`race` AS buyer_race FROM `".$characters_db[$realm_id]['name']."`.`characters` , `".$characters_db[$realm_id]['name']."`.`item_instance` , `".$world_db[$realm_id]['name']."`.`item_template` , `".$characters_db[$realm_id]['name']."`.`auctionhouse` LEFT JOIN `".$characters_db[$realm_id]['name']."`.`characters` c2 ON `c2`.`guid`=`auctionhouse`.`buyguid` WHERE `auctionhouse`.`itemowner`=`characters`.`guid` AND `item_instance`.`itemEntry`=`item_template`.`entry` AND `auctionhouse`.`itemguid`=`item_instance`.`guid` $search_filter $order_side ORDER BY `auctionhouse`.`$order_by` $order_dir LIMIT $start, $itemperpage");
+    $result = $sqlc->query("SELECT BINARY `characters`.`name` AS `seller`, `item_instance`.`itemEntry` AS `itemid`, `item_template`.`name` AS `itemname`, `auctionhouse`.`buyoutprice` AS `buyout`, CAST(`auctionhouse`.`time` AS SIGNED)-CAST(unix_timestamp() AS SIGNED), BINARY `c2`.`name` AS `encherisseur`, `auctionhouse`.`lastbid`, `auctionhouse`.`startbid`, `item_instance`.`count` AS qty, `characters`.`race` AS seller_race, `c2`.`race` AS buyer_race FROM `".$characters_db[$realm_id]['name']."`.`characters` , `".$characters_db[$realm_id]['name']."`.`item_instance` , `".$world_db[$realm_id]['name']."`.`item_template` , `".$characters_db[$realm_id]['name']."`.`auctionhouse` LEFT JOIN `".$characters_db[$realm_id]['name']."`.`characters` c2 ON `c2`.`guid`=`auctionhouse`.`buyguid` WHERE `auctionhouse`.`itemowner`=`characters`.`guid` AND `item_instance`.`itemEntry`=`item_template`.`entry` AND `auctionhouse`.`itemguid`=`item_instance`.`guid` $search_filter $order_side ORDER BY `auctionhouse`.`$order_by` $order_dir LIMIT $start, $itemperpage");
     $all_record = $sqlc->result($query_1,0);
 
     //=====================top tage navigaion starts here========================
