@@ -44,7 +44,7 @@ class SQL //MySQLi
         if ($query_id){
             if ($row) @mysqli_data_seek($query_id, $row);
             $cur_row = @mysqli_fetch_row($query_id);
-            return $cur_row[0];
+            return $cur_row[0] ?? null;
         } else return false;
     }
 	
@@ -100,7 +100,7 @@ class SQL //MySQLi
     if( is_array($value) ) {
         return array_map( array('SQL','quote_smart') , $value);
     } else {
-        if( get_magic_quotes_gpc() ) $value = stripslashes($value);
+//        if( get_magic_quotes_gpc() ) $value = stripslashes($value);
         if( $value === '' ) $value = NULL;
         return mysqli_real_escape_string($this->link_id, $value);
         }

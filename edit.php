@@ -17,7 +17,7 @@ function edit_user(&$sqlr, &$sqlc)
     $sqlm = new SQL;
     $sqlm->connect($mmfpm_db['addr'], $mmfpm_db['user'], $mmfpm_db['pass'], $mmfpm_db['name']);
 
-    $refguid = $sqlm->result($sqlm->query('SELECT InvitedBy FROM mm_point_system_invites WHERE PlayersAccount = \''.$user_id.'\''), 0, 'InvitedBy');
+    $refguid = $sqlm->result($sqlm->query('SELECT COALESCE(InvitedBy, 0) FROM mm_point_system_invites WHERE PlayersAccount = \''.$user_id.'\''), 0, 'InvitedBy');
     $referred_by = $sqlc->result($sqlc->query('SELECT BINARY name AS name FROM characters WHERE guid = \''.$refguid.'\''), 0, 'name');
     unset($refguid);
 
