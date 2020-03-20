@@ -1262,8 +1262,8 @@ function edit() {
     $sql->connect($world_db[$realm_id]['addr'], $world_db[$realm_id]['user'], $world_db[$realm_id]['pass'], $world_db[$realm_id]['name']);
 
     $entry = $sql->quote_smart($_GET['entry']);
-    $deplang = get_lang_id();
-    $result = $sql->query("SELECT `item_template`.`entry`,`class`,`subclass`,`unk0`,IFNULL(".($deplang<>0?"name_loc$deplang":"NULL").",`name`) as name,`displayid`,`Quality`,`Flags`,`BuyCount`,`BuyPrice`,`SellPrice`,`InventoryType`,`AllowableClass`,`AllowableRace`,`ItemLevel`,`RequiredLevel`,`RequiredSkill`,`RequiredSkillRank`,`requiredspell`,`requiredhonorrank`,`RequiredCityRank`,`RequiredReputationFaction`,`RequiredReputationRank`,`maxcount`,`stackable`,`ContainerSlots`,`stat_type1`,`stat_value1`,`stat_type2`,`stat_value2`,`stat_type3`,`stat_value3`,`stat_type4`,`stat_value4`,`stat_type5`,`stat_value5`,`stat_type6`,`stat_value6`,`stat_type7`,`stat_value7`,`stat_type8`,`stat_value8`,`stat_type9`,`stat_value9`,`stat_type10`,`stat_value10`,`dmg_min1`,`dmg_max1`,`dmg_type1`,`dmg_min2`,`dmg_max2`,`dmg_type2`,`armor`,`holy_res`,`fire_res`,`nature_res`,`frost_res`,`shadow_res`,`arcane_res`,`delay`,`ammo_type`,`RangedModRange`,`spellid_1`,`spelltrigger_1`,`spellcharges_1`,`spellppmRate_1`,`spellcooldown_1`,`spellcategory_1`,`spellcategorycooldown_1`,`spellid_2`,`spelltrigger_2`,`spellcharges_2`,`spellppmRate_2`,`spellcooldown_2`,`spellcategory_2`,`spellcategorycooldown_2`,`spellid_3`,`spelltrigger_3`,`spellcharges_3`,`spellppmRate_3`,`spellcooldown_3`,`spellcategory_3`,`spellcategorycooldown_3`,`spellid_4`,`spelltrigger_4`,`spellcharges_4`,`spellppmRate_4`,`spellcooldown_4`,`spellcategory_4`,`spellcategorycooldown_4`,`spellid_5`,`spelltrigger_5`,`spellcharges_5`,`spellppmRate_5`,`spellcooldown_5`,`spellcategory_5`,`spellcategorycooldown_5`,`bonding`,`description`,`PageText`,`LanguageID`,`PageMaterial`,`startquest`,`lockid`,`Material`,`sheath`,`RandomProperty`,`RandomSuffix`,`block`,`itemset`,`MaxDurability`,`area`,`Map`,`BagFamily`,`TotemCategory`,`socketColor_1`,`socketContent_1`,`socketColor_2`,`socketContent_2`,`socketColor_3`,`socketContent_3`,`socketBonus`,`GemProperties`,`RequiredDisenchantSkill`,`ArmorDamageModifier`,`ScriptName`,`DisenchantID`,`FoodType`,`minMoneyLoot`,`maxMoneyLoot` FROM item_template LEFT JOIN locales_item ON item_template.entry = locales_item.entry WHERE item_template.entry = '$entry'");
+    $deplang = get_localestr_by_lang_cookie();
+    $result = $sql->query("SELECT `item_template`.`entry`,`class`,`subclass`,null AS `unk0`,COALESCE(item_template_locale.Name, item_template.name) as name,`displayid`,`Quality`,`Flags`,`BuyCount`,`BuyPrice`,`SellPrice`,`InventoryType`,`AllowableClass`,`AllowableRace`,`ItemLevel`,`RequiredLevel`,`RequiredSkill`,`RequiredSkillRank`,`requiredspell`,`requiredhonorrank`,`RequiredCityRank`,`RequiredReputationFaction`,`RequiredReputationRank`,`maxcount`,`stackable`,`ContainerSlots`,`stat_type1`,`stat_value1`,`stat_type2`,`stat_value2`,`stat_type3`,`stat_value3`,`stat_type4`,`stat_value4`,`stat_type5`,`stat_value5`,`stat_type6`,`stat_value6`,`stat_type7`,`stat_value7`,`stat_type8`,`stat_value8`,`stat_type9`,`stat_value9`,`stat_type10`,`stat_value10`,`dmg_min1`,`dmg_max1`,`dmg_type1`,`dmg_min2`,`dmg_max2`,`dmg_type2`,`armor`,`holy_res`,`fire_res`,`nature_res`,`frost_res`,`shadow_res`,`arcane_res`,`delay`,`ammo_type`,`RangedModRange`,`spellid_1`,`spelltrigger_1`,`spellcharges_1`,`spellppmRate_1`,`spellcooldown_1`,`spellcategory_1`,`spellcategorycooldown_1`,`spellid_2`,`spelltrigger_2`,`spellcharges_2`,`spellppmRate_2`,`spellcooldown_2`,`spellcategory_2`,`spellcategorycooldown_2`,`spellid_3`,`spelltrigger_3`,`spellcharges_3`,`spellppmRate_3`,`spellcooldown_3`,`spellcategory_3`,`spellcategorycooldown_3`,`spellid_4`,`spelltrigger_4`,`spellcharges_4`,`spellppmRate_4`,`spellcooldown_4`,`spellcategory_4`,`spellcategorycooldown_4`,`spellid_5`,`spelltrigger_5`,`spellcharges_5`,`spellppmRate_5`,`spellcooldown_5`,`spellcategory_5`,`spellcategorycooldown_5`,`bonding`,item_template.`description`,`PageText`,`LanguageID`,`PageMaterial`,`startquest`,`lockid`,`Material`,`sheath`,`RandomProperty`,`RandomSuffix`,`block`,`itemset`,`MaxDurability`,`area`,`Map`,`BagFamily`,`TotemCategory`,`socketColor_1`,`socketContent_1`,`socketColor_2`,`socketContent_2`,`socketColor_3`,`socketContent_3`,`socketBonus`,`GemProperties`,`RequiredDisenchantSkill`,`ArmorDamageModifier`,`ScriptName`,`DisenchantID`,`FoodType`,`minMoneyLoot`,`maxMoneyLoot` FROM item_template LEFT JOIN item_template_locale ON (item_template.entry = item_template_locale.ID AND item_template_locale.locale = '$deplang') WHERE item_template.entry = '$entry'");
 
     if ($result)
     {
@@ -2318,7 +2318,7 @@ function edit() {
                         <th width=\"25%\">{$lang_item_edit['mob_quest_drop_chance']}</th>
                     </tr>";
 
-        $result2 = $sql->query("SELECT entry,ChanceOrQuestChance,`groupid` FROM creature_loot_template WHERE item = {$item['entry']} ORDER BY `groupid`,ChanceOrQuestChance DESC LIMIT 5");
+        $result2 = $sql->query("SELECT entry,Chance AS ChanceOrQuestChance,`groupid` FROM creature_loot_template WHERE item = {$item['entry']} ORDER BY `groupid`,ChanceOrQuestChance DESC LIMIT 5");
         while ($info = $sql->fetch_row($result2))
         {
             $result3 = $sql->query("SELECT creature_template.entry,IFNULL(".($deplang<>0?"name_loc$deplang":"NULL").",`name`) as name,maxlevel FROM creature_template LEFT JOIN locales_creature ON creature_template.entry = locales_creature.entry WHERE lootid = {$info[0]} LIMIT 1");
@@ -2342,7 +2342,7 @@ function edit() {
             }
         }
 
-        $result2 = $sql->query("SELECT creature_template.entry,IFNULL(".($deplang<>0?"name_loc$deplang":"NULL").",`name`) as name,maxlevel FROM creature_template LEFT JOIN locales_creature ON creature_template.entry = locales_creature.entry WHERE creature_template.entry IN (SELECT entry FROM npc_vendor WHERE item = {$item['entry']}) ORDER BY maxlevel DESC LIMIT 5");
+        $result2 = $sql->query("SELECT creature_template.entry,COALESCE(creature_template_locale.Name, creature_template.name) as name,maxlevel FROM creature_template LEFT JOIN creature_template_locale ON (creature_template.entry = creature_template_locale.entry AND creature_template_locale.locale = '$deplang') WHERE creature_template.entry IN (SELECT entry FROM npc_vendor WHERE item = {$item['entry']}) ORDER BY maxlevel DESC LIMIT 5");
         if ($sql->num_rows($result2))
         {
             $output .= "<tr class=\"large_bold\"><td colspan=\"4\" class=\"hidden\" align=\"left\">{$lang_item_edit['sold_by']}: {$lang_item_edit['limit_x']}</td></tr>";
@@ -2366,9 +2366,9 @@ function edit() {
             }
         }
 
-        $result2 = $sql->query("SELECT quest_template.Id,IFNULL(".($deplang<>0?"title_loc$deplang":"NULL").",`title`) as title,Level FROM quest_template LEFT JOIN locales_quest ON quest_template.Id = locales_quest.entry WHERE ( SourceItemId = {$item['entry']} OR RequiredItemId1 = {$item['entry']} OR
-                            RequiredItemId2 = {$item['entry']} OR RequiredItemId3 = {$item['entry']} OR RequiredItemId4 = {$item['entry']} OR RewardItemId1 = {$item['entry']} OR
-                            RewardItemId2 = {$item['entry']} OR RewardItemId3 = {$item['entry']} OR RewardItemId4 = {$item['entry']} ) ORDER BY Level DESC");
+        $result2 = $sql->query("SELECT quest_template.Id,COALESCE(quest_template_locale.Title, quest_template.LogTitle) as title,QuestLevel AS level FROM quest_template LEFT JOIN quest_template_locale ON (quest_template.Id = quest_template_locale.ID AND quest_template_locale.locale = '$deplang' ) WHERE ( RequiredItemId1 = {$item['entry']} OR
+                            RequiredItemId2 = {$item['entry']} OR RequiredItemId3 = {$item['entry']} OR RequiredItemId4 = {$item['entry']} OR RewardItem1 = {$item['entry']} OR
+                            RewardItem2 = {$item['entry']} OR RewardItem3 = {$item['entry']} OR RewardItem4 = {$item['entry']} ) ORDER BY Level DESC");
 
         if ($sql->num_rows($result2))
         {
@@ -2384,7 +2384,7 @@ function edit() {
             }
         }
 
-        $result2 = $sql->query("SELECT quest_template.Id,IFNULL(".($deplang<>0?"title_loc$deplang":"NULL").",`title`) as title,Level FROM quest_template LEFT JOIN locales_quest ON quest_template.Id = locales_quest.entry WHERE ( RewardChoiceItemId1 = {$item['entry']} OR RewardChoiceItemId2 = {$item['entry']} OR
+        $result2 = $sql->query("SELECT quest_template.Id,COALESCE(quest_template_locale.Title, quest_template.LogTitle) as title,QuestLevel AS Level FROM quest_template LEFT JOIN quest_template_locale ON (quest_template.Id = quest_template_locale.ID AND quest_template_locale.locale = '$deplang' ) WHERE ( RewardChoiceItemId1 = {$item['entry']} OR RewardChoiceItemId2 = {$item['entry']} OR
                                 RewardChoiceItemId3 = {$item['entry']} OR RewardChoiceItemId4 = {$item['entry']} OR RewardChoiceItemId5 = {$item['entry']} OR RewardChoiceItemId6 = {$item['entry']} )
                                 ORDER BY Level DESC");
         if ($sql->num_rows($result2))
@@ -2422,7 +2422,7 @@ function edit() {
             $output .= "
                         <table class=\"hidden\" align=\"center\">
                             <tr>";
-            $result1 = $sql->query("SELECT item,ChanceOrQuestChance,`groupid`,mincountOrRef,maxcount,lootcondition,condition_value1, condition_value2 FROM disenchant_loot_template WHERE entry = {$item['DisenchantID']} ORDER BY ChanceOrQuestChance DESC");
+            $result1 = $sql->query("SELECT item,Chance AS ChanceOrQuestChance,`groupid`,MinCount as mincountOrRef,maxcount,LootMode AS lootcondition,null AS condition_value1,null AS condition_value2 FROM disenchant_loot_template WHERE entry = {$item['DisenchantID']} ORDER BY ChanceOrQuestChance DESC");
 
             while ($item = $sql->fetch_row($result1))
             {
