@@ -1,10 +1,16 @@
 <?php
 
 
+use Application\Modules\FrontPageModule;
+use Application\Repositories\AbstractRepository;
+use Application\ViewModels\ServerConfiguration;
+
 require_once 'header.php';
 require_once 'libs/bbcode_lib.php';
 require_once 'libs/char_lib.php';
 require_once 'libs/map_zone_lib.php';
+require_once 'vendor/autoload.php';
+
 if (isset($action_permission['read']))
 	valid_login($action_permission['read']);
 
@@ -14,80 +20,90 @@ if (isset($action_permission['read']))
 function front(&$sqlr, &$sqlc, &$sqlm)
 {
     global $output, $lang_global, $lang_index,
-            $realm_id, $world_db, $mmfpm_db, $server,
+            $realm_id, $realm_db, $world_db, $mmfpm_db, $server,
             $action_permission, $user_lvl, $user_id,
             $showcountryflag, $motd_display_poster, $gm_online_count, $gm_online, $itemperpage;
 
-    $output .= '
-                <div class="top">';
+    $module = new FrontPageModule(
+        $realm_id,
+        AbstractRepository::convertArrayToCredentails($mmfpm_db),
+        AbstractRepository::convertArrayToCredentails($realm_db),
+        null,
+        AbstractRepository::convertArrayToCredentails($world_db[$realm_id]));
+    $serverConfiguration = ServerConfiguration::convertArrayToConfiguration($server[$realm_id]);
+    $output .= $module->renderTop($serverConfiguration, $lang_index);
+    $online = $module->isOnline();
 
-    if (test_port($server[$realm_id]['addr'],$server[$realm_id]['game_port']))
-    {
-        $stats = $sqlr->fetch_assoc($sqlr->query('SELECT starttime, maxplayers FROM uptime WHERE realmid = '.$realm_id.' ORDER BY starttime DESC LIMIT 1'), 0);
-        $uptimetime = time() - $stats['starttime'];
+//    $output .= '
+//                <div class="top">';
+//
+//    if (test_port($server[$realm_id]['addr'],$server[$realm_id]['game_port']))
+//    {
+//        $stats = $sqlr->fetch_assoc($sqlr->query('SELECT starttime, maxplayers FROM uptime WHERE realmid = '.$realm_id.' ORDER BY starttime DESC LIMIT 1'), 0);
+//        $uptimetime = time() - $stats['starttime'];
+//
+//        function format_uptime($seconds)
+//        {
+//            $secs  = intval($seconds % 60);
+//            $mins  = intval($seconds / 60 % 60);
+//            $hours = intval($seconds / 3600 % 24);
+//            $days  = intval($seconds / 86400);
+//
+//            $uptimeString='';
+//
+//            if ($days)
+//            {
+//                $uptimeString .= $days;
+//                $uptimeString .= ((1 === $days) ? ' day' : ' days');
+//            }
+//            if ($hours)
+//            {
+//                $uptimeString .= ((0 < $days) ? ', ' : '').$hours;
+//                $uptimeString .= ((1 === $hours) ? ' hour' : ' hours');
+//            }
+//            if ($mins)
+//            {
+//                $uptimeString .= ((0 < $days || 0 < $hours) ? ', ' : '').$mins;
+//                $uptimeString .= ((1 === $mins) ? ' minute' : ' minutes');
+//            }
+//            if ($secs)
+//            {
+//                $uptimeString .= ((0 < $days || 0 < $hours || 0 < $mins) ? ', ' : '').$secs;
+//                $uptimeString .= ((1 === $secs) ? ' second' : ' seconds');
+//            }
+//            return $uptimeString;
+//        }
+//
+//        $staticUptime = $lang_index['realm'].' <em>'.htmlentities(get_realm_name($realm_id)).'</em> '.$lang_index['online'].' for '.format_uptime($uptimetime);
+//        unset($uptimetime);
+//        $output .= '
+//                    <div id="uptime">
+//                        <h1>
+//                            <font color="#55aa55">'.$staticUptime.'<br />'.$lang_index['maxplayers'].': '.$stats['maxplayers'].'</font>
+//                        </h1>
+//                    </div>';
+//        unset($staticUptime);
+//        unset($stats);
+//        $online = true;
+//    }
+//    else
+//    {
+//        $output .= '
+//                    <h1>
+//                        <font class="error">'.$lang_index['realm'].' <em>'.htmlentities(get_realm_name($realm_id)).'</em> '.$lang_index['offline_or_let_high'].'</font>
+//                    </h1>';
+//        $online = false;
+//    }
 
-        function format_uptime($seconds)
-        {
-            $secs  = intval($seconds % 60);
-            $mins  = intval($seconds / 60 % 60);
-            $hours = intval($seconds / 3600 % 24);
-            $days  = intval($seconds / 86400);
-
-            $uptimeString='';
-
-            if ($days)
-            {
-                $uptimeString .= $days;
-                $uptimeString .= ((1 === $days) ? ' day' : ' days');
-            }
-            if ($hours)
-            {
-                $uptimeString .= ((0 < $days) ? ', ' : '').$hours;
-                $uptimeString .= ((1 === $hours) ? ' hour' : ' hours');
-            }
-            if ($mins)
-            {
-                $uptimeString .= ((0 < $days || 0 < $hours) ? ', ' : '').$mins;
-                $uptimeString .= ((1 === $mins) ? ' minute' : ' minutes');
-            }
-            if ($secs)
-            {
-                $uptimeString .= ((0 < $days || 0 < $hours || 0 < $mins) ? ', ' : '').$secs;
-                $uptimeString .= ((1 === $secs) ? ' second' : ' seconds');
-            }
-            return $uptimeString;
-        }
-
-        $staticUptime = $lang_index['realm'].' <em>'.htmlentities(get_realm_name($realm_id)).'</em> '.$lang_index['online'].' for '.format_uptime($uptimetime);
-        unset($uptimetime);
-        $output .= '
-                    <div id="uptime">
-                        <h1>
-                            <font color="#55aa55">'.$staticUptime.'<br />'.$lang_index['maxplayers'].': '.$stats['maxplayers'].'</font>
-                        </h1>
-                    </div>';
-        unset($staticUptime);
-        unset($stats);
-        $online = true;
-    }
-    else
-    {
-        $output .= '
-                    <h1>
-                        <font class="error">'.$lang_index['realm'].' <em>'.htmlentities(get_realm_name($realm_id)).'</em> '.$lang_index['offline_or_let_high'].'</font>
-                    </h1>';
-        $online = false;
-    }
-
-    $sqlw = new SQL;
-    $sqlw->connect($world_db[$realm_id]['addr'], $world_db[$realm_id]['user'], $world_db[$realm_id]['pass'], $world_db[$realm_id]['name']);
-
-    //  This retrieves the actual database version from the database itself, instead of hardcoding it into a string
-    $version = $sqlw->fetch_assoc($sqlw->query('SELECT core_revision, db_version FROM version'), 0);
-    $output .= '
-                    '.$lang_index['trinity_rev'].' '.$version['core_revision'].' '.$lang_index['using_db'].' '.$version['db_version'].'
-                </div>';
-    unset($version);
+//    $sqlw = new SQL;
+//    $sqlw->connect($world_db[$realm_id]['addr'], $world_db[$realm_id]['user'], $world_db[$realm_id]['pass'], $world_db[$realm_id]['name']);
+//
+//    //  This retrieves the actual database version from the database itself, instead of hardcoding it into a string
+//    $version = $sqlw->fetch_assoc($sqlw->query('SELECT core_revision, db_version FROM version'), 0);
+//    $output .= '
+//                    '.$lang_index['trinity_rev'].' '.$version['core_revision'].' '.$lang_index['using_db'].' '.$version['db_version'].'
+//                </div>';
+//    unset($version);
 
     //MOTD part
     $start_m = (isset($_GET['start_m'])) ? $sqlc->quote_smart($_GET['start_m']) : 0;
@@ -100,67 +116,70 @@ function front(&$sqlr, &$sqlc, &$sqlm)
 
     $all_record_m = $sqlm->result($sqlm->query('SELECT count(*) FROM mm_motd'), 0);
 
-    if ($user_lvl >= $action_permission['delete'])
-        $output .= '
-                <script type="text/javascript">
-                    // <![CDATA[
-                        answerbox.btn_ok="'.$lang_global['yes_low'].'";
-                        answerbox.btn_cancel="'.$lang_global['no'].'";
-                        var del_motd = "motd.php?action=delete_motd&amp;id=";
-                    // ]]>
-                </script>';
-    $output .= '
-                <center>
-                    <table class="lined">
-                        <tr>
-                            <th align="right">';
-    if ($user_lvl >= $action_permission['insert'])
-        $output .= '
-                                <a href="motd.php?action=add_motd">'.$lang_index['add_motd'].'</a>';
-    $output .= '
-                            </th>
-                        </tr>';
 
-    if($all_record_m)
-    {
-        $result = $sqlm->query('SELECT id, realmid, type, content FROM mm_motd WHERE realmid = '.$realm_id.' ORDER BY id DESC LIMIT '.$start_m.', 3');
-        while($post = $sqlm->fetch_assoc($result))
-        {
-            $output .= '
-                        <tr>
-                            <td align="left" class="large">
-                                <blockquote>'.bbcode_bbc2html($post['content']).'</blockquote>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td align="right">';
-            ($motd_display_poster) ? $output .= $post['type'] : '';
+    $output .= '<center>';
+//    if ($user_lvl >= $action_permission['delete'])
+//        $output .= '
+//                <script type="text/javascript">
+//                    // <![CDATA[
+//                        answerbox.btn_ok="'.$lang_global['yes_low'].'";
+//                        answerbox.btn_cancel="'.$lang_global['no'].'";
+//                        var del_motd = "motd.php?action=delete_motd&amp;id=";
+//                    // ]]>
+//                </script>';
+    $output .= $module->renderMOTD($user_lvl, $action_permission, $motd_display_poster, $lang_global, $lang_index);
 
-            if ($user_lvl >= $action_permission['delete'])
-                $output .= '
-                                <img src="img/cross.png" width="12" height="12" onclick="answerBox(\''.$lang_global['delete'].': &lt;font color=white&gt;'.$post['id'].'&lt;/font&gt;&lt;br /&gt;'.$lang_global['are_you_sure'].'\', del_motd + '.$post['id'].');" style="cursor:pointer;" alt="" />';
-            if ($user_lvl >= $action_permission['update'])
-                $output .= '
-                                <a href="motd.php?action=edit_motd&amp;error=3&amp;id='.$post['id'].'">
-                                    <img src="img/edit.png" width="14" height="14" alt="" />
-                                </a>';
-            $output .= '
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="hidden"></td>
-                        </tr>';
-        }
-        if ($online)
-            $output .= '%%REPLACE_TAG%%';
-        else
-            $output .= '
-                        <tr>
-                            <td align="right" class="hidden">'.generate_pagination('index.php?start=0', $all_record_m, 3, $start_m, 'start_m').'</td>
-                        </tr>';
-    }
-    $output .= '
-                    </table>';
+
+//    $output .= '<table class="lined">
+//                        <tr>
+//                            <th align="right">';
+//    if ($user_lvl >= $action_permission['insert'])
+//        $output .= '
+//                                <a href="motd.php?action=add_motd">'.$lang_index['add_motd'].'</a>';
+//    $output .= '
+//                            </th>
+//                        </tr>';
+//
+//    if($all_record_m)
+//    {
+//        $result = $sqlm->query('SELECT id, realmid, type, content FROM mm_motd WHERE realmid = '.$realm_id.' ORDER BY id DESC LIMIT '.$start_m.', 3');
+//        while($post = $sqlm->fetch_assoc($result))
+//        {
+//            $output .= '
+//                        <tr>
+//                            <td align="left" class="large">
+//                                <blockquote>'.bbcode_bbc2html($post['content']).'</blockquote>
+//                            </td>
+//                        </tr>
+//                        <tr>
+//                            <td align="right">';
+//            ($motd_display_poster) ? $output .= $post['type'] : '';
+//
+//            if ($user_lvl >= $action_permission['delete'])
+//                $output .= '
+//                                <img src="img/cross.png" width="12" height="12" onclick="answerBox(\''.$lang_global['delete'].': &lt;font color=white&gt;'.$post['id'].'&lt;/font&gt;&lt;br /&gt;'.$lang_global['are_you_sure'].'\', del_motd + '.$post['id'].');" style="cursor:pointer;" alt="" />';
+//            if ($user_lvl >= $action_permission['update'])
+//                $output .= '
+//                                <a href="motd.php?action=edit_motd&amp;error=3&amp;id='.$post['id'].'">
+//                                    <img src="img/edit.png" width="14" height="14" alt="" />
+//                                </a>';
+//            $output .= '
+//                            </td>
+//                        </tr>
+//                        <tr>
+//                            <td class="hidden"></td>
+//                        </tr>';
+//        }
+//        if ($online)
+//            $output .= '%%REPLACE_TAG%%';
+//        else
+//            $output .= '
+//                        <tr>
+//                            <td align="right" class="hidden">'.generate_pagination('index.php?start=0', $all_record_m, 3, $start_m, 'start_m').'</td>
+//                        </tr>';
+//    }
+//    $output .= '
+//                    </table>';
 
     //print online chars
     if ($online)
@@ -315,13 +334,10 @@ function front(&$sqlr, &$sqlc, &$sqlm)
 // MAIN
 //#############################################################################
 
-//$action = (isset($_GET['action'])) ? $_GET['action'] : NULL;
-
 $lang_index = lang_index();
 
 front($sqlr, $sqlc, $sqlm);
 
-//unset($action);
 unset($action_permission);
 unset($lang_index);
 
