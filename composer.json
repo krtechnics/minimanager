@@ -1,0 +1,17 @@
+{
+    "name": "kevinroelofse/minimanager",
+    "authors": [
+        {
+            "name": "Kevin Roelofse",
+            "email": "kevinroelofse@gmail.com"
+        }
+    ],
+    "require": {
+      "ext-pdo": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Application\\": "application/"
+        }
+    }
+}

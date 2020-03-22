@@ -2,8 +2,9 @@
 
 namespace Application\Modules;
 
-use Application\Repositories\AbstractRepository;
-use Application\ViewModels\DatabaseCredentials;
+use Application\ViewModels\ServerConfiguration;
+use Application\ViewModels\User;
+use MongoDB\Driver\Server;
 use PDO;
 
 abstract class AbstractModule
@@ -33,25 +34,27 @@ abstract class AbstractModule
      */
     protected $worldConnection;
 
-    public function __construct(int $realmID, ?DatabaseCredentials $mmftcCredentails, ?DatabaseCredentials $realmCredentails, ?DatabaseCredentials $characterCredentials, ?DatabaseCredentials $wordCredentails)
+    /**
+     * @var ServerConfiguration
+     */
+    protected $serverConfiguration;
+    /**
+     * @var User
+     */
+    protected $user;
+
+    public function __construct(int $realmID,User $user, ?PDO $mmftcConnection, ?PDO $realmConnection, ?PDO $characterConnection, ?PDO $wordConnection)
     {
         $this->realmID = $realmID;
-        if ($mmftcCredentails !== null) {
-            $this->mmftcConnection = AbstractRepository::connectMySQL($mmftcCredentails);
-        }
+        $this->user = $user;
 
-        if ($realmCredentails !== null) {
-            $this->realmConnection = AbstractRepository::connectMySQL($realmCredentails);
-        }
-
-        if ($characterCredentials !== null) {
-            $this->characterConnection = AbstractRepository::connectMySQL($characterCredentials);
-        }
-
-        if ($wordCredentails !== null) {
-            $this->worldConnection = AbstractRepository::connectMySQL($wordCredentails);
-        }
+        $this->mmftcConnection = $mmftcConnection;
+        $this->realmConnection = $realmConnection;
+        $this->characterConnection = $characterConnection;
+        $this->worldConnection = $wordConnection;
     }
 
-
+    public function setServerConfiguration(ServerConfiguration $serverConfiguration){
+        $this->serverConfiguration = $serverConfiguration;
+    }
 }
