@@ -2011,10 +2011,15 @@ function lang_instances()
   $lang_instances = array
   (
   'instances' => 'Instanzen',
+  'parent' => 'übergeordnete Karte',
   'total' => 'Total',
   'map' => 'Karte',
+  'mapid' => 'Karte ID',
   'level_min' => 'Mindeststufe',
   'level_max' => 'H&ouml;chststufe',
+  'item_level' => 'Gegenstandsstufe',
+  'quest_a' => 'Quest A',
+  'quest_h' => 'Quest H',
   );
   return $lang_instances;
 }

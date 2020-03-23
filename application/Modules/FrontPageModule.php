@@ -9,7 +9,7 @@ use Application\Repositories\FrontPage\FrontPageWorldRepository;
 use Application\ViewModels\User;
 use PDO;
 
-class FrontPageModule extends AbstractModule
+final class FrontPageModule extends AbstractModule
 {
     /**
      * @var FrontPageRealmRepository
@@ -148,10 +148,10 @@ class FrontPageModule extends AbstractModule
         return $uptimeString;
     }
 
-    public function renderMOTD($user_lvl, $action_permission, $showPoster, $lang_global, $lang_index)
+    public function renderMOTD($action_permission, $showPoster, $lang_global, $lang_index)
     {
         $output = '';
-        if ($user_lvl >= $action_permission['delete']) {
+        if ($this->user->getUserLevel() >= $action_permission['delete']) {
             $output .= '
                 <script type="text/javascript">
                     // <![CDATA[
@@ -165,7 +165,7 @@ class FrontPageModule extends AbstractModule
         $output .= '<table class="lined">
                         <tr>
                             <th align="right">';
-        if ($user_lvl >= $action_permission['insert']) {
+        if ($this->user->getUserLevel() >= $action_permission['insert']) {
             $output .= '<a href="motd.php?action=add_motd">' . $lang_index['add_motd'] . '</a>';
         }
         $output .= '
@@ -190,10 +190,10 @@ class FrontPageModule extends AbstractModule
                             <td align="right">';
                 ($showPoster) ? $output .= $post['type'] : '';
 
-                if ($user_lvl >= $action_permission['delete'])
+                if ($this->user->getUserLevel() >= $action_permission['delete'])
                     $output .= '
                                 <img src="img/cross.png" width="12" height="12" onclick="answerBox(\'' . $lang_global['delete'] . ': &lt;font color=white&gt;' . $post['id'] . '&lt;/font&gt;&lt;br /&gt;' . $lang_global['are_you_sure'] . '\', del_motd + ' . $post['id'] . ');" style="cursor:pointer;" alt="" />';
-                if ($user_lvl >= $action_permission['update'])
+                if ($this->user->getUserLevel() >= $action_permission['update'])
                     $output .= '
                                 <a href="motd.php?action=edit_motd&amp;error=3&amp;id=' . $post['id'] . '">
                                     <img src="img/edit.png" width="14" height="14" alt="" />
@@ -221,9 +221,7 @@ class FrontPageModule extends AbstractModule
             }
 
         }
-        $output .= '
-                    </table>';
-        return $output;
+        return $output . '</table>';
     }
 
     public function isOnline()
@@ -320,7 +318,7 @@ class FrontPageModule extends AbstractModule
                 '%%REPLACE_TAG%%',
                 $replace,
                 $output
-            );;
+            );
             $output .= '
                     <font class="bold">' . $lang_index['tot_users_online'] . ': ' . $totalOnline . '</font>
                     <table class="lined">

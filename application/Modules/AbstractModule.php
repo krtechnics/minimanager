@@ -43,7 +43,7 @@ abstract class AbstractModule
      */
     protected $user;
 
-    public function __construct(int $realmID,User $user, ?PDO $mmftcConnection, ?PDO $realmConnection, ?PDO $characterConnection, ?PDO $wordConnection)
+    public function __construct(int $realmID, ?User $user, ?PDO $mmftcConnection, ?PDO $realmConnection, ?PDO $characterConnection, ?PDO $wordConnection)
     {
         $this->realmID = $realmID;
         $this->user = $user;

@@ -2027,6 +2027,7 @@ function lang_instances()
 	'quest_h' => 'Quest H',
     'level_min' => 'Minimum level',
     'level_max' => 'Maximum level',
+    'parent' => 'Parent map',
   );
   return $lang_instances;
 }
