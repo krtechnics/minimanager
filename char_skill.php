@@ -34,7 +34,7 @@ function char_skill(&$sqlr, &$sqlc)
 
         // we get user permissions first
         $owner_acc_id = $char['account'];
-        $result = $sqlr->query('SELECT `username`, `gmlevel` FROM `account` LEFT JOIN `account_access` ON `account`.`id`=`account_access`.`id` WHERE `account`.`id` = '.$owner_acc_id.' ORDER BY `gmlevel` DESC LIMIT 1');
+        $result = $sqlr->query('SELECT `username`, SecurityLevel AS `gmlevel` FROM `account` LEFT JOIN `account_access` ON `account`.`id`=`account_access`.AccountID WHERE `account`.`id` = '.$owner_acc_id.' ORDER BY `gmlevel` DESC LIMIT 1');
         $owner_name = $sqlr->result($result, 0, 'username');
         $owner_gmlvl = $sqlr->result($result, 0, 'gmlevel');
         if (empty($owner_gmlvl))

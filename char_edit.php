@@ -33,7 +33,7 @@ function edit_char() { //form needs update, uneditable fields have been removed 
         //resrict by owner's gmlvl
         $owner_acc_id = $sql->result($result, 0, 'account');
         $sql->connect($realm_db['addr'], $realm_db['user'], $realm_db['pass'], $realm_db['name']);
-        $query = $sql->query("SELECT gmlevel FROM account_access WHERE id ='$owner_acc_id'");
+        $query = $sql->query("SELECT SecurityLevel aS gmlevel FROM account_access WHERE AccountID ='$owner_acc_id'");
         $query = $sql->query("SELECT username FROM account WHERE id ='$owner_acc_id'");
         $owner_gmlvl = $sql->result($query, 0, 'gmlevel');
         $owner_name = $sql->result($query, 0, 'username');
