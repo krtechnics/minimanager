@@ -6,14 +6,14 @@ class DBLayer
 	var $saved_queries = array();
 	var $num_queries = 0;
 
-	function DBLayer($db_host, $db_username, $db_password, $db_name)
+	function __construct($db_host, $db_username, $db_password, $db_name)
 	{
 		$this->link_id = @mysqli_connect($db_host, $db_username, $db_password, $db_name);
 
 		if ($this->link_id)
 		{
-			if (@mysqli_select_db($this->link_id, $db_name))
-				return $this->link_id;
+			if (@mysqli_select_db($this->link_id, $db_name)){}
+//				return $this->link_id;
 			else
             {
 				//error('Unable to select database. MySQL reported: '.mysql_error());
