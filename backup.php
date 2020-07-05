@@ -83,11 +83,24 @@ function backup_step2()
         $save_all_realms = (isset($_GET['save_all_realms'])) ? addslashes($_GET['save_all_realms']) : 0;
     }
 
-    $upload_max_filesize=ini_get("upload_max_filesize");
-    if (eregi("([0-9]+)K",$upload_max_filesize,$tempregs))
-        $upload_max_filesize=$tempregs[1]*1024;
-    if (eregi("([0-9]+)M",$upload_max_filesize,$tempregs))
-        $upload_max_filesize=$tempregs[1]*1024*1024;
+    function return_bytes($val) {
+        preg_match('/(?<value>\d+)(?<option>.?)/i', trim($val), $matches);
+        $inc = array(
+            'g' => 1073741824, // (1024 * 1024 * 1024)
+            'm' => 1048576, // (1024 * 1024)
+            'k' => 1024
+        );
+
+        $value = (int) $matches['value'];
+        $key = strtolower(trim($matches['option']));
+        if (isset($inc[$key])) {
+            $value *= $inc[$key];
+        }
+
+        return $value;
+    }
+
+    $upload_max_filesize = return_bytes(ini_get('upload_max_filesize'));
 
     switch ($backup_action)
     {

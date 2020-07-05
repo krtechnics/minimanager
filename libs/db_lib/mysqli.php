@@ -93,7 +93,8 @@ class SQL //MySQLi
     }
 
     function field_name($query_id = 0,$field_offset){
-        return false; //TODO
+        $fieldInfo = mysqli_fetch_field_direct($query_id, $field_offset);
+        return $fieldInfo->name;
     }
 
     function quote_smart($value){

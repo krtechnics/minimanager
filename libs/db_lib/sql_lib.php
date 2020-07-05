@@ -7,7 +7,7 @@ function sql_table_dump ($dbhost, $dbuser, $dbpass, $database, $table, $construc
  global $lang_global;
 
  $sql_0 = new SQL;
- $sql_0->connect($dbhost, $dbuser, $dbpass, $database, true);
+ $sql_0->connect($dbhost, $dbuser, $dbpass, $database);
 
  $fp = fopen($file, 'r+') or die (error($lang_backup['file_write_err']));
  fseek($fp,0,SEEK_END);
@@ -118,7 +118,7 @@ function sql_table_dump ($dbhost, $dbuser, $dbpass, $database, $table, $construc
 		$row = $sql_0->fetch_row($query);
 		for($j=0; $j<$num_fields; $j++) {
 			$row[$j] = addslashes($row[$j]);
-			$row[$j] = ereg_replace("\n","\\n",$row[$j]);
+			$row[$j] = str_replace("\n","\\n",$row[$j]);
 			if (isset($row[$j])) {
 				if ($sql_0->field_type($query,$j) == "int") fwrite($fp, "$row[$j]")or die (error($lang_backup['file_write_err']));
 					else fwrite($fp, "'$row[$j]'")or die (error($lang_backup['file_write_err']));
@@ -169,8 +169,8 @@ function run_sql_script($dbhost, $dbuser, $dbpass, $dbname, $path, $unlink) {
 			$dumpline .= fgets($fp, 16384);
 			}
 
-		$dumpline=ereg_replace("\r\n$", "\n", $dumpline);
-		$dumpline=ereg_replace("\r$", "\n", $dumpline);
+		$dumpline=str_replace("\r\n$", "\n", $dumpline);
+		$dumpline=str_replace("\r$", "\n", $dumpline);
 
 		if (!$inparents){ 
 			$skipline=false;
@@ -192,7 +192,7 @@ function run_sql_script($dbhost, $dbuser, $dbpass, $dbname, $path, $unlink) {
 
 		$query .= $dumpline;
 
-		if (ereg(";$",trim($dumpline)) && !$inparents){ 
+		if (str_replace(";$",trim($dumpline)) && !$inparents){
 			if (!$sql_1->query(trim($query))){
 				fclose($fp);
 				if($unlink) unlink($path);
