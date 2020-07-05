@@ -18,7 +18,7 @@ function dologin(&$sqlr)
     if (255 < strlen($user_name) || 255 < strlen($user_pass))
         redirect('login.php?error=1');
 
-    $result = $sqlr->query('SELECT account.id AS id, username, gmlevel FROM account LEFT JOIN account_access ON account.id=account_access.id WHERE username = \''.$user_name.'\' AND sha_pass_hash = \''.$user_pass.'\'');
+    $result = $sqlr->query('SELECT account.id AS id, username, SecurityLevel AS gmlevel FROM account LEFT JOIN account_access ON (account.id = account_access.AccountID) WHERE username = \''.$user_name.'\' AND sha_pass_hash = \''.$user_pass.'\'');
     if ($require_account_verify)
     {
         $sql2 = new SQL;
@@ -110,18 +110,27 @@ function login(&$sqlr)
                                 <tr align="right">
                                     <td>'.$lang_login['select_realm'].' :
                                         <select name="realm">';
-        while ($realm = $sqlr->fetch_assoc($result))
-            if(isset($server[$realm['id']]))
+        while ($realm = $sqlr->fetch_assoc($result)) {
+            if (isset($server[$realm['id']])) {
                 $output .= '
-                                            <option value="'.$realm['id'].'">'.htmlentities($realm['name']).'</option>';
+                                            <option value="' . $realm['id'] . '">' . htmlentities(
+                        $realm['name']
+                    ) . '</option>';
+            }
+        }
         $output .= '
                                         </select>
                                     </td>
                                 </tr>';
     }
-    else
+    else {
         $output .= '
-                                <input type="hidden" name="realm" value="'.$sqlr->result($result, 0, 'id').'" />';
+                                <input type="hidden" name="realm" value="' . $sqlr->result(
+                $result,
+                0,
+                'id'
+            ) . '" />';
+    }
     $output .= '
                                 <tr>
                                     <td>

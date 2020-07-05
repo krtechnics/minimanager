@@ -28,9 +28,9 @@ function show_realm(&$sqlr)
     $dir = ($dir) ? 0 : 1;
     //==========================$_GET and SECURE end=============================
 
-    $result = $sqlr->query('SELECT realmlist.id AS rid, name, address, port, icon, flag, timezone,
-                            (SELECT SUM(numchars) FROM realmcharacters WHERE realmid = rid) as sum
-                            FROM realmlist ORDER BY '.$order_by.' '.$order_dir.'');
+    $result = $sqlr->query('SELECT r.id AS rid, name, address, port, icon, flag, timezone,
+                            (SELECT SUM(numchars) FROM realmcharacters WHERE realmid = r.id) as sum
+                            FROM realmlist r ORDER BY '.$order_by.' '.$order_dir);
     $total_realms = $sqlr->num_rows($result);
 
     $output .= '
@@ -143,9 +143,9 @@ function edit_realm(&$sqlr)
     else
         redirect('realm.php?error=1');
 
-    if ($realm = $sqlr->fetch_assoc($sqlr->query('SELECT realmlist.id AS rid, name, address, port, icon, flag, timezone,
-                                                (SELECT SUM(numchars) FROM realmcharacters WHERE realmid = rid) as sum
-                                                FROM realmlist WHERE id ='.$id.'')))
+    if ($realm = $sqlr->fetch_assoc($sqlr->query('SELECT r.id AS rid, name, address, port, icon, flag, timezone,
+                                                (SELECT SUM(numchars) FROM realmcharacters WHERE realmid = r.id) as sum
+                                                FROM realmlist r WHERE id ='.$id.'')))
     {
         $output .= '
                 <center>

@@ -45,7 +45,7 @@ function browse_users(&$sqlr, &$sqlc)
 
     $order_by2 = $order_by;
     if ($order_by == 'gmlevel')
-        $order_by = 'account_access.gmlevel';
+        $order_by = 'account_access.SecurityLevel';
     elseif ($order_by == 'online')
         $order_by = 'account.online';
     else
@@ -70,17 +70,17 @@ function browse_users(&$sqlr, &$sqlc)
         // developer note: 'if else' is always faster then 'switch case'
         if ($search_by === 'greater_gmlevel')
         {
-            $sql_query = 'SELECT `account_access`.`gmlevel`, `account`.`username`, `account`.`id`, `account`.`expansion`, `account`.`email`, `account`.`joindate`, `account`.`failed_logins`, `account`.`locked`, `account`.`last_login`, `account`.`online`, `account`.`last_ip` FROM account LEFT JOIN account_access ON account.id=account_access.id WHERE account_access.gmlevel < '.$search_value.' ORDER BY '.$order_by.' '.$order_dir.' LIMIT '.$start.', '.$itemperpage.'';
-            $query_1 = $sqlr->query('SELECT count(*) FROM account_access WHERE gmlevel = "%'.$search_value.'%"');
+            $sql_query = 'SELECT SecurityLevel AS `gmlevel`, `account`.`username`, `account`.`id`, `account`.`expansion`, `account`.`email`, `account`.`joindate`, `account`.`failed_logins`, `account`.`locked`, `account`.`last_login`, `account`.`online`, `account`.`last_ip` FROM account LEFT JOIN account_access ON account.id=account_access.AccountID WHERE account_access.SecurityLevel < '.$search_value.' ORDER BY '.$order_by.' '.$order_dir.' LIMIT '.$start.', '.$itemperpage.'';
+            $query_1 = $sqlr->query('SELECT count(*) FROM account_access WHERE SecurityLevel = "%'.$search_value.'%"');
         }
         elseif ($search_by === 'gmlevel')
         {
-            $sql_query = 'SELECT `account_access`.`gmlevel`, `account`.`username`, `account`.`id`, `account`.`expansion`, `account`.`email`, `account`.`joindate`, `account`.`failed_logins`, `account`.`locked`, `account`.`last_login`, `account`.`online`, `account`.`last_ip` FROM account LEFT JOIN account_access ON account.id=account_access.id WHERE account_access.gmlevel = '.$search_value.' ORDER BY '.$order_by.' '.$order_dir.' LIMIT '.$start.', '.$itemperpage.'';
-            $query_1 = $sqlr->query('SELECT count(*) FROM account_access WHERE gmlevel = "%'.$search_value.'%"');
+            $sql_query = 'SELECT SecurityLevel AS `gmlevel`, `account`.`username`, `account`.`id`, `account`.`expansion`, `account`.`email`, `account`.`joindate`, `account`.`failed_logins`, `account`.`locked`, `account`.`last_login`, `account`.`online`, `account`.`last_ip` FROM account LEFT JOIN account_access ON account.id=account_access.AccountID WHERE account_access.SecurityLevel = '.$search_value.' ORDER BY '.$order_by.' '.$order_dir.' LIMIT '.$start.', '.$itemperpage.'';
+            $query_1 = $sqlr->query('SELECT count(*) FROM account_access WHERE SecurityLevel = "%'.$search_value.'%"');
         }
         elseif ($search_by === 'banned')
         {
-            $sql_query = 'SELECT `account_access`.`gmlevel`, `account`.`username`, `account`.`id`, `account`.`expansion`, `account`.`email`, `account`.`joindate`, `account`.`failed_logins`, `account`.`locked`, `account`.`last_login`, `account`.`online`, `account`.`last_ip` FROM account LEFT JOIN account_access ON account.id=account_access.id WHERE account.id = 0 ';
+            $sql_query = 'SELECT SecurityLevel AS `gmlevel`, `account`.`username`, `account`.`id`, `account`.`expansion`, `account`.`email`, `account`.`joindate`, `account`.`failed_logins`, `account`.`locked`, `account`.`last_login`, `account`.`online`, `account`.`last_ip` FROM account LEFT JOIN account_access ON account.id=account_access.AccountID WHERE account.id = 0 ';
             $count_query = 'SELECT count(*) FROM account WHERE id = 0 ';
             $que = $sqlr->query('SELECT id FROM account_banned');
             while ($banned = $sqlr->fetch_assoc($que))
@@ -94,24 +94,24 @@ function browse_users(&$sqlr, &$sqlc)
         }
         elseif ($search_by === 'failed_logins')
         {
-            $sql_query = 'SELECT `account_access`.`gmlevel`, `account`.`username`, `account`.`id`, `account`.`expansion`, `account`.`email`, `account`.`joindate`, `account`.`failed_logins`, `account`.`locked`, `account`.`last_login`, `account`.`online`, `account`.`last_ip` FROM account LEFT JOIN account_access ON account.id=account_access.id WHERE failed_logins = '.$search_value.' ORDER BY '.$order_by.' '.$order_dir.' LIMIT '.$start.', '.$itemperpage.'';
+            $sql_query = 'SELECT SecurityLevel AS `gmlevel`, `account`.`username`, `account`.`id`, `account`.`expansion`, `account`.`email`, `account`.`joindate`, `account`.`failed_logins`, `account`.`locked`, `account`.`last_login`, `account`.`online`, `account`.`last_ip` FROM account LEFT JOIN account_access ON account.id=account_access.AccountID WHERE failed_logins = '.$search_value.' ORDER BY '.$order_by.' '.$order_dir.' LIMIT '.$start.', '.$itemperpage.'';
             $query_1 = $sqlr->query('SELECT count(*) FROM account WHERE failed_logins = '.$search_value.'');
         }
         elseif ($search_by === 'greater_failed_logins')
         {
-            $sql_query = 'SELECT `account_access`.`gmlevel`, `account`.`username`, `account`.`id`, `account`.`expansion`, `account`.`email`, `account`.`joindate`, `account`.`failed_logins`, `account`.`locked`, `account`.`last_login`, `account`.`online`, `account`.`last_ip` FROM account LEFT JOIN account_access ON account.id=account_access.id WHERE failed_logins > '.$search_value.' ORDER BY '.$order_by.' '.$order_dir.' LIMIT '.$start.', '.$itemperpage.'';
+            $sql_query = 'SELECT SecurityLevel AS `gmlevel`, `account`.`username`, `account`.`id`, `account`.`expansion`, `account`.`email`, `account`.`joindate`, `account`.`failed_logins`, `account`.`locked`, `account`.`last_login`, `account`.`online`, `account`.`last_ip` FROM account LEFT JOIN account_access ON account.id=account_access.AccountID WHERE failed_logins > '.$search_value.' ORDER BY '.$order_by.' '.$order_dir.' LIMIT '.$start.', '.$itemperpage.'';
             $query_1 = $sqlr->query('SELECT count(*) FROM account WHERE failed_logins > '.$search_value.'');
         }
         elseif ($search_by === 'lesser_failed_logins')
         {
-            $sql_query = 'SELECT `account_access`.`gmlevel`, `account`.`username`, `account`.`id`, `account`.`expansion`, `account`.`email`, `account`.`joindate`, `account`.`failed_logins`, `account`.`locked`, `account`.`last_login`, `account`.`online`, `account`.`last_ip` FROM account LEFT JOIN account_access ON account.id=account_access.id WHERE failed_logins < '.$search_value.' ORDER BY '.$order_by.' '.$order_dir.' LIMIT '.$start.', '.$itemperpage.'';
+            $sql_query = 'SELECT SecurityLevel AS `gmlevel`, `account`.`username`, `account`.`id`, `account`.`expansion`, `account`.`email`, `account`.`joindate`, `account`.`failed_logins`, `account`.`locked`, `account`.`last_login`, `account`.`online`, `account`.`last_ip` FROM account LEFT JOIN account_access ON account.id=account_access.AccountID WHERE failed_logins < '.$search_value.' ORDER BY '.$order_by.' '.$order_dir.' LIMIT '.$start.', '.$itemperpage.'';
             $query_1 = $sqlr->query('SELECT count(*) FROM account WHERE failed_logins < '.$search_value.'');
         }
         else
         {
             // default search case
-            $sql_query = 'SELECT `account_access`.`gmlevel`, `account`.`username`, `account`.`id`, `account`.`expansion`, `account`.`email`, `account`.`joindate`, `account`.`failed_logins`, `account`.`locked`, `account`.`last_login`, `account`.`online`, `account`.`last_ip` FROM account LEFT JOIN account_access ON account.id=account_access.id WHERE `account`.'.$search_by.' LIKE "%'.$search_value.'%" ORDER BY '.$order_by.' '.$order_dir.' LIMIT '.$start.', '.$itemperpage.'';
-            $query_1 = $sqlr->query('SELECT count(*) FROM account LEFT JOIN account_access ON account.id=account_access.id WHERE `account`.'.$search_by.' LIKE "%'.$search_value.'%"');
+            $sql_query = 'SELECT SecurityLevel AS `gmlevel`, `account`.`username`, `account`.`id`, `account`.`expansion`, `account`.`email`, `account`.`joindate`, `account`.`failed_logins`, `account`.`locked`, `account`.`last_login`, `account`.`online`, `account`.`last_ip` FROM account LEFT JOIN account_access ON account.id=account_access.AccountID WHERE `account`.'.$search_by.' LIKE "%'.$search_value.'%" ORDER BY '.$order_by.' '.$order_dir.' LIMIT '.$start.', '.$itemperpage.'';
+            $query_1 = $sqlr->query('SELECT count(*) FROM account LEFT JOIN account_access ON account.id=account_access.AccountID WHERE `account`.'.$search_by.' LIKE "%'.$search_value.'%"');
         }
         $query = $sqlr->query($sql_query);
     }
@@ -119,7 +119,7 @@ function browse_users(&$sqlr, &$sqlc)
     {
         // get total number of items
         $query_1 = $sqlr->query('SELECT count(*) FROM account');
-        $query = $sqlr->query('SELECT `account_access`.`gmlevel`, `account`.* FROM account LEFT JOIN account_access ON account.id=account_access.id ORDER BY '.$order_by.' '.$order_dir.' LIMIT '.$start.', '.$itemperpage.'');
+        $query = $sqlr->query('SELECT SecurityLevel AS `gmlevel`, `account`.* FROM account LEFT JOIN account_access ON account.id=account_access.AccountID ORDER BY '.$order_by.' '.$order_dir.' LIMIT '.$start.', '.$itemperpage.'');
     }
     // this is for multipage support
     $all_record = $sqlr->result($query_1,0);

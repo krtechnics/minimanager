@@ -21,7 +21,7 @@ function edit_user(&$sqlr, &$sqlc)
     $referred_by = $sqlc->result($sqlc->query('SELECT BINARY name AS name FROM characters WHERE guid = \''.$refguid.'\''), 0, 'name');
     unset($refguid);
 
-    if ($acc = $sqlc->fetch_assoc($sqlr->query('SELECT email, gmlevel, joindate, expansion, last_ip FROM account LEFT JOIN account_access ON account.id=account_access.id WHERE username = \''.$user_name.'\'')))
+    if ($acc = $sqlc->fetch_assoc($sqlr->query('SELECT email, SecurityLevel AS gmlevel, joindate, expansion, last_ip FROM account LEFT JOIN account_access ON account.id=account_access.AccountID WHERE username = \''.$user_name.'\'')))
     {
         if ($acc['gmlevel'] == null)
             $acc['gmlevel'] = 0;

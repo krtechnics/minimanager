@@ -50,12 +50,12 @@ function browse_guilds(&$sqlr, &$sqlc)
     //==========================MyGuild==========================================
 
     $query_myGuild = $sqlc->query("SELECT g.guildid as gid, BINARY g.name, g.leaderguid AS lguid,
-                                    (SELECT BINARY name from characters where guid = lguid), (SELECT race in (2,5,6,8,10) from characters where guid = lguid) as faction,
-                                    (select count(*) from characters where guid in (select guid from guild_member where guildid = lguid) and online = 1) as gonline,
-                                    (select count(*) from guild_member where guildid = gid), SUBSTRING_INDEX(g.MOTD,' ',6), g.createdate,
-                                    (select account from characters where guid = lguid) FROM guild as g
+                                    (SELECT BINARY name from characters where guid = g.leaderguid), (SELECT race in (2,5,6,8,10) from characters where guid = g.leaderguid) as faction,
+                                    (select count(*) from characters where guid in (select guid from guild_member where guildid = g.leaderguid) and online = 1) as gonline,
+                                    (select count(*) from guild_member where guildid = g.guildid), SUBSTRING_INDEX(g.MOTD,' ',6), g.createdate,
+                                    (select account from characters where guid = g.leaderguid) FROM guild as g
                                     left outer join guild_member as gm on gm.guildid = g.guildid left outer join characters as c on c.guid = gm.guid
-                                    where c.account = $user_id group by g.guildid order by gid");
+                                    where c.account = $user_id group by g.guildid order by g.guildid");
 
     if ($query_myGuild)
     {
@@ -75,7 +75,7 @@ function browse_guilds(&$sqlr, &$sqlc)
                             </tr>';
         while ($data = $sqlr->fetch_row($query_myGuild))
         {
-            $result = $sqlr->query("SELECT gmlevel FROM account_access WHERE id ='$data[9]'");
+            $result = $sqlr->query("SELECT SecurityLevel AS gmlevel FROM account_access WHERE AccountID ='$data[9]'");
             $owner_gmlvl = $sqlr->result($result, 0, 'gmlevel');
             $output .= "
                             <tr>
@@ -117,8 +117,8 @@ function browse_guilds(&$sqlr, &$sqlc)
                 if (preg_match('/^[\t\v\b\f\a\n\r\\\"\'\? <>[](){}_=+-|!@#$%^&*~`.,0123456789\0]{1,30}$/', $search_value))
                     redirect("guild.php?error=5&amp;realm=$realmid");
                 $query = $sqlc->query("SELECT g.guildid as gid, BINARY g.name,g.leaderguid as lguid,
-                                      (SELECT BINARY name from characters where guid = lguid) as lname, c.race in (2,5,6,8,10) as lfaction,
-                                      (select count(*) from guild_member where guildid = gid) as tot_chars, createdate, c.account as laccount
+                                      (SELECT BINARY name from characters where guid = g.leaderguid ) as lname, c.race in (2,5,6,8,10) as lfaction,
+                                      (select count(*) from guild_member where guildid = g.guildid) as tot_chars, createdate, c.account as laccount
                                       FROM guild as g left outer join characters as c on c.guid = g.leaderguid
                                       where BINARY g.name like '%$search_value%' ORDER BY $order_by $order_dir LIMIT $start, $itemperpage");
                 $query_count = $sqlc->query("SELECT 1 from guild where BINARY name like '%$search_value%'");
@@ -128,8 +128,8 @@ function browse_guilds(&$sqlr, &$sqlc)
                 if (preg_match('/^[\t\v\b\f\a\n\r\\\"\'\? <>[](){}_=+-|!@#$%^&*~`.,0123456789\0]{1,30}$/', $search_value))
                     redirect("guild.php?error=5&amp;realm=$realmid");
                 $query = $sqlc->query("SELECT g.guildid as gid, BINARY g.name,g.leaderguid as lguid,
-                                      (SELECT BINARY name from characters where guid = lguid) as lname, c.race in (2,5,6,8,10) as lfaction,
-                                      (select count(*) from guild_member where guildid = gid) as tot_chars, createdate, c.account as laccount
+                                      (SELECT BINARY name from characters where guid = g.leaderguid) as lname, c.race in (2,5,6,8,10) as lfaction,
+                                      (select count(*) from guild_member where guildid = g.guildid) as tot_chars, createdate, c.account as laccount
                                       FROM guild as g left outer join characters as c on c.guid = g.leaderguid where g.leaderguid in
                                       (SELECT guid from characters where BINARY name like '%$search_value%') ORDER BY $order_by $order_dir LIMIT $start, $itemperpage");
                 $query_count = $sqlc->query("SELECT 1 from guild where leaderguid in (select guid from characters where BINARY name like '%$search_value%')");
@@ -140,8 +140,8 @@ function browse_guilds(&$sqlr, &$sqlc)
                 else
                     redirect("guild.php?error=5&amp;realm=$realmid");
                 $query = $sqlc->query("SELECT g.guildid as gid, BINARY g.name,g.leaderguid as lguid,
-                                      (SELECT BINARY name from characters where guid = lguid) as lname, c.race in (2,5,6,8,10) as lfaction,
-                                      (select count(*) from guild_member where guildid = gid) as tot_chars, createdate, c.account as laccount
+                                      (SELECT BINARY name from characters where guid = g.leaderguid) as lname, c.race in (2,5,6,8,10) as lfaction,
+                                      (select count(*) from guild_member where guildid = g.guildid) as tot_chars, createdate, c.account as laccount
                                       FROM guild as g left outer join characters as c on c.guid = g.leaderguid
                                       where g.guildid = '$search_value' ORDER BY $order_by $order_dir LIMIT $start, $itemperpage");
                 $query_count = $sqlc->query("SELECT 1 from guild where guildid = '$search_value'");
@@ -153,7 +153,7 @@ function browse_guilds(&$sqlr, &$sqlc)
     }
     else
     {
-        $query = $sqlc->query("SELECT g.guildid as gid, BINARY g.name,g.leaderguid as lguid, (SELECT BINARY name from characters where guid = lguid) as lname, c.race in (2,5,6,8,10) as lfaction, (select count(*) from guild_member where guildid = gid) as tot_chars, createdate, c.account as laccount FROM guild as g left outer join characters as c on c.guid = g.leaderguid ORDER BY $order_by $order_dir LIMIT $start, $itemperpage");
+        $query = $sqlc->query("SELECT g.guildid as gid, BINARY g.name,g.leaderguid as lguid, (SELECT BINARY name from characters where guid = g.leaderguid) as lname, c.race in (2,5,6,8,10) as lfaction, (select count(*) from guild_member where guildid = g.guildid) as tot_chars, createdate, c.account as laccount FROM guild as g left outer join characters as c on c.guid = g.leaderguid ORDER BY $order_by $order_dir LIMIT $start, $itemperpage");
         $query_count = $sqlc->query("SELECT 1 from guild");
     }
     $all_record = $sqlc->num_rows($query_count);
@@ -214,7 +214,7 @@ function browse_guilds(&$sqlr, &$sqlc)
                             </tr>";
     while ($data = $sqlr->fetch_row($query))
     {
-        $result = $sqlr->query("SELECT gmlevel FROM account_access WHERE id ='$data[7]'");
+        $result = $sqlr->query("SELECT SecurityLevel FROM account_access WHERE AccountID ='$data[7]'");
         $owner_gmlvl = $sqlr->result($result, 0, 'gmlevel');
         $output .= "
                             <tr>
@@ -391,7 +391,7 @@ function view_guild()
                                             </tr>";
     $members = $sqlc->query("SELECT gm.guid as cguid, BINARY c.name as cname, c.`race` as crace ,c.`class` as cclass,
                             c.`level` AS clevel,
-                            gm.rank AS mrank, (SELECT BINARY rname FROM guild_rank WHERE guildid ='$guild_id' AND rid = mrank) AS rname,
+                            gm.rank AS mrank, (SELECT BINARY rname FROM guild_rank WHERE guildid ='$guild_id' AND rid = gm.rank) AS rname,
                             BINARY gm.Pnote, BINARY gm.OFFnote, gender,
                             c.`online` as conline, c.`account`, c.`logout_time` as clogout
                             FROM guild_member as gm left outer join characters as c on c.guid = gm.guid
@@ -399,7 +399,7 @@ function view_guild()
 
     while ($member = $sqlr->fetch_row($members))
     {
-        $result = $sqlr->query("SELECT gmlevel FROM account_access WHERE id ='$member[11]'");
+        $result = $sqlr->query("SELECT SecurityLevel AS gmlevel FROM account_access WHERE AccountID ='$member[11]'");
         $owner_gmlvl = $sqlr->result($result, 0, 'gmlevel');
         $output .= "
                                             <tr>";
