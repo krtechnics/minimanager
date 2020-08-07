@@ -28,7 +28,7 @@
 }
 
 form {
-   margin: 0px;
+   margin: 0;
 }
 
 input, input.mouseover, a.button {
@@ -101,7 +101,7 @@ tr td.bar span.rank{
 /*** link tabs ***/
 
 #tab ul {
-	padding: 0px 50px;
+	padding: 0 50px;
 }
 
 #tab_content {

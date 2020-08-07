@@ -14,7 +14,7 @@ html,body{
 	background-color:#0a1324;
         background-image: url(background.jpg);
 	height:100%;
-	padding:0px; /* required for Opera to have 0 margin */
+	padding:0; /* required for Opera to have 0 margin */
 	margin:0;
 	font:11pt Verdana,sans-serif;
 	cursor:default;
@@ -24,8 +24,8 @@ a:link, a:visited{ color: #2094f6; text-decoration: none }
 a:hover, a:focus{ color: #20b2f6; text-decoration: none }
 
 .table_top {
-	border-width: 0px;
-	border-spacing: 0px;
+	border-width: 0;
+	border-spacing: 0;
 	border-style: none;
 	border-collapse: collapse;
 	width: 845px;
@@ -136,7 +136,7 @@ a:hover, a:focus{ color: #20b2f6; text-decoration: none }
 	font:8pt Verdana,sans-serif;
 }
 h1{
-    margin:0px;
+    margin:0;
     font:16pt Trebuchet MS,sans-serif;
     font-weight:bold;
     color:#e9e6e6;
@@ -144,7 +144,7 @@ h1{
 }
 
 form {
-   margin: 0px;
+   margin: 0;
 }
 input, input.mouseover, a.button {
 	border: 1px solid #565656;
@@ -162,7 +162,7 @@ input {
 	margin-left: 2px;
 }
 input[type="text"],input[type="password"]{
-	background:#a2a2a;
+	background:#a2a2a2;
 }
 input[type="text"]:hover, input[type="password"]:hover {
     background:#ffffff;
@@ -175,7 +175,7 @@ input[type="text"]:focus,input[type="password"]:focus {
 }
 input[type="radio"],input[type="checkbox"]{
 	background:none;
-	border:0px;
+	border:0;
 }
 select,textarea{
 	color:#000000;
@@ -183,8 +183,8 @@ select,textarea{
 	background-color: #93b3bf;
 	}
 img {
-	border: 0px;
-	padding: 0px;
+	border: 0;
+	padding: 0;
 }
 a.button {
 	background:#93b3bf;
@@ -261,21 +261,21 @@ table.flat td {
 	padding: 5px;
 }
 table.hidden {
-	border-width: 0px;
-	border-spacing: 0px;
+	border-width: 0;
+	border-spacing: 0;
 	border-style: none;
 	border-collapse: collapse;
 	text-align: center;
 }
 table.top_hidden {
 	width: 770px;
-	border: 0px none #d4ddd8;
-	border-spacing: 0px;
+	border: 0 none #d4ddd8;
+	border-spacing: 0;
 	border-collapse: collapse;
 	text-align: left;
 }
 table.top_hidden td, table.hidden td {
-	padding: 4px 0px;
+	padding: 4px 0;
 }
 table.lined {
 	width: 770px;
@@ -331,7 +331,7 @@ img.bag_icon {
 tr td.bag div,
 tr td.bank div {
 	position: relative;
-	border: 0px;
+	border: 0;
 	margin: 2px;
 	background-image: url(../../img/INV/Slot_Bag.gif);
 	background-repeat: repeat;
@@ -348,7 +348,7 @@ tr td.bank div div{
 }
 tr td.bag div div img,
 tr td.bank div div img{
-	border: 0px;
+	border: 0;
 	padding: 1px;
 	width: 35px; 
 	height: 35px;
@@ -356,7 +356,7 @@ tr td.bank div div img{
 tr td.bag div.no_slot,
 tr td.bank div.no_slot{
 	position: absolute;
-	margin: 0px;
+	margin: 0;
 	width: 86px;
 	height: 41px;
 	background-image: url(../../img/INV/Slot_Bag_Out.gif);
@@ -415,7 +415,7 @@ tr th a.DESC{
 /*****BUBBLE******/
 div.bubble {
 	position:relative;
-    padding:7px 0px;
+    padding:7px 0;
     background-color:#afccd3;
     margin-bottom:15px;
 	text-align: left;
@@ -438,20 +438,20 @@ i.tl, i.tr, i.bl, i.br {
     z-index:30;
 }
 i.tl {
-    top:0px;
-    left:0px;
+    top:0;
+    left:0;
 }
 i.tr {
-    top:0px;
-    right:0px;
+    top:0;
+    right:0;
 }
 i.bl {
-    bottom:0px;
-    left:0px;
+    bottom:0;
+    left:0;
 }
 i.br {
-    bottom:0px;
-    right:0px;
+    bottom:0;
+    right:0;
 }
 /*****BUBBLE END******/
 
@@ -490,7 +490,7 @@ i.br {
 }
 
 .icon_border_0 {
-	border: 0px;
+	border: 0;
 	padding: 6px;
 	width: 32px;
 	height: 32px;
@@ -498,7 +498,7 @@ i.br {
 }
 
 .icon_border_1 {
-	border: 0px;
+	border: 0;
 	padding: 6px;
 	width: 32px;
 	height: 32px;
@@ -506,7 +506,7 @@ i.br {
 }
 
 .icon_border_2 {
-	border: 0px;
+	border: 0;
 	padding: 6px;
 	width: 32px;
 	height: 32px;
@@ -514,7 +514,7 @@ i.br {
 }
 
 .icon_border_3 {
-	border: 0px;
+	border: 0;
 	padding: 6px;
 	width: 32px;
 	height: 32px;
@@ -522,7 +522,7 @@ i.br {
 }
 
 .icon_border_4 {
-	border: 0px;
+	border: 0;
 	padding: 6px;
 	width: 32px;
 	height: 32px;
@@ -530,7 +530,7 @@ i.br {
 }
 
 .icon_border_5 {
-	border: 0px;
+	border: 0;
 	padding: 6px;
 	width: 32px;
 	height: 32px;
@@ -538,7 +538,7 @@ i.br {
 }
 
 .icon_border_6 {
-	border: 0px;
+	border: 0;
 	padding: 6px;
 	width: 32px;
 	height: 32px;
@@ -625,8 +625,8 @@ tr td.rep0 {color:#cc2222}
 
 /*** link tabs ***/
 #tab ul {
-	padding: 0px 30px;
-	margin: 0px;
+	padding: 0 30px;
+	margin: 0;
 	list-style: none;
 }
 #tab li {
@@ -671,7 +671,7 @@ tr td.rep0 {color:#cc2222}
 /*** Java layer tabs ***/
 .jtabs {
 	margin: 0;
-	padding: 0px 0px 0px 30px;
+	padding: 0 0 0 30px;
 	list-style: none;
 }
 .jtabs li {
@@ -704,33 +704,6 @@ tr td.rep0 {color:#cc2222}
 .jtab-panes { margin: 3px }
 
 /*** item tooltips***/
-.item_tooltip  td{
-	float: none;
-	font-size: 11px;
-	color: #d4d4d4;
-	border:1px solid #70c7f0;
-	padding:10px;
-	width:auto;
-	background-color:#000;
-	text-align:left;
-	filter:alpha(opacity=80);
-	-moz-opacity:.80;
-	opacity:0.80;
-}
-.info_tooltip  td{
-	float: none;
-	font-size: 11px;
-	color: #d4d4d4;
-	border:0px solid #70c7f0;
-	padding:10px;
-	width:240px;
-	background-color:#000;
-	text-align:left;
-	filter:alpha(opacity=85);
-	-moz-opacity:.85;
-	opacity:0.85;
-}
-
 .answerbox {
 	font-size: 11px;
 	color: #d4d4d4;
