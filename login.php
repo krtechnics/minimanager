@@ -191,7 +191,7 @@ function do_cookie_login(&$sqlr)
     $user_name = $sqlr->quote_smart($_COOKIE['uname']);
     $user_pass = $sqlr->quote_smart($_COOKIE['p_hash']);
 
-    $result = $sqlr->query('SELECT account.id AS id, username, gmlevel FROM account LEFT JOIN account_access ON account.id=account_access.id WHERE username = \''.$user_name.'\' AND sha_pass_hash = \''.$user_pass.'\'');
+    $result = $sqlr->query('SELECT account.id AS id, username, SecurityLevel FROM account LEFT JOIN account_access ON account.id=account_access.id WHERE username = \''.$user_name.'\' AND sha_pass_hash = \''.$user_pass.'\'');
 
     unset($user_name);
     unset($user_pass);
@@ -207,10 +207,10 @@ function do_cookie_login(&$sqlr)
             $_SESSION['user_id']   = $id;
             $_SESSION['uname']     = $info['username'];
 
-            if ($info['gmlevel'] == NULL)
+            if ($info['SecurityLevel'] == NULL)
                 $_SESSION['user_lvl']  = 0;
             else
-                $_SESSION['user_lvl']  = $info['gmlevel'];
+                $_SESSION['user_lvl']  = $info['SecurityLevel'];
 
             $_SESSION['realm_id']  = $sqlr->quote_smart($_COOKIE['realm_id']);
             $_SESSION['client_ip'] = (isset($_SERVER['REMOTE_ADDR']) ) ? $_SERVER['REMOTE_ADDR'] : getenv('REMOTE_ADDR');

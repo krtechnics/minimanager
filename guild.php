@@ -215,7 +215,7 @@ function browse_guilds(&$sqlr, &$sqlc)
     while ($data = $sqlr->fetch_row($query))
     {
         $result = $sqlr->query("SELECT SecurityLevel FROM account_access WHERE AccountID ='$data[7]'");
-        $owner_gmlvl = $sqlr->result($result, 0, 'gmlevel');
+        $owner_gmlvl = $sqlr->result($result, 0, 'SecurityLevel');
         $output .= "
                             <tr>
                                 <td>$data[0]</td>";

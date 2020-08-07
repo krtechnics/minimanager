@@ -97,7 +97,7 @@ function char_friends(&$sqlr, &$sqlc)
                                         </tr>';
                 while ($data = $sqlc->fetch_assoc($result))
                 {
-                    $char_gm_level=$sqlr->result($sqlr->query('SELECT SecurityLevel AS gmlevel FROM account_access WHERE AccountID = '.$data['account']), 0, 'gmlevel');
+                    $char_gm_level=$sqlr->result($sqlr->query('SELECT SecurityLevel AS gmlevel FROM account_access WHERE AccountID = '.$data['account']), 0, 'SecurityLevel');
                     $output .= '
                                         <tr>
                                             <td>';

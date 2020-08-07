@@ -26,11 +26,11 @@ else
     $sql2 = new SQL;
     $sql2->connect($realm_db['addr'], $realm_db['user'], $realm_db['pass'], $realm_db['name']);
 
-    $data = mysql_fetch_array($query);
+    $data = $sql->fetch_row($query);
     list($id,$username,$pass,$mail,$joindate,$last_ip,$failed_logins,$locked,$last_login,$expansion) = $data;
     $sql2->query("INSERT INTO account (id,username,sha_pass_hash,email, joindate,last_ip,failed_logins,locked,last_login,expansion) VALUES ('',UPPER('$username'),'$pass','$mail',now(),'$last_ip','0','$locked',NULL,'$expansion')");
     $result = $sql2->query("SELECT * FROM account WHERE username='$username'");
-    $data = mysql_fetch_assoc($result);
+    $data = $sql2->fetch_row($result);
     $sql2->query("INSERT INTO account_access (AccountID,SecurityLevel) VALUES ('{$data['id']}','0')");
 
 }
