@@ -8,7 +8,7 @@ valid_login($action_permission['read']);
 //#############################################################################
 // BROWSE AUCTIONS
 //#############################################################################
-function browse_auctions(SQL &$sqlr, SQL &$sqlc)
+function browse_auctions(SQL &$sqlr, SQL &$sqlc, SQL &$sqlw)
 {
     global $lang_auctionhouse, $lang_global, $lang_item, $output, $characters_db, $world_db, $realm_id, $itemperpage, $item_datasite, $server, $user_lvl, $user_id;
     wowhead_tt();
@@ -87,8 +87,7 @@ function browse_auctions(SQL &$sqlr, SQL &$sqlc)
                     if ($search_quality >= 0){
                         $item_prefix .= "AND item_template.Quality = '$search_quality' ";
                     }
-
-                    $result = $sqlc->query("SELECT `entry` FROM `".$world_db[$realm_id]['name']."`.`item_template` WHERE `name` LIKE '%$search_value%' $item_prefix");
+                    $result = $sqlw->query("SELECT `entry` FROM `item_template` WHERE `name` LIKE '%$search_value%' $item_prefix");
                     $search_filter = "AND item_instance.itemEntry IN(0";
 
                     while ($item = $sqlc->fetch_row($result)){
@@ -173,17 +172,17 @@ function browse_auctions(SQL &$sqlr, SQL &$sqlc)
             default:
                 redirect("ahstats.php?error=1");
         }
-        $query_1 = $sqlc->query("SELECT count(*) FROM `".$characters_db[$realm_id]['name']."`.`characters` , `".$characters_db[$realm_id]['name']."`.`item_instance` , `".$world_db[$realm_id]['name']."`.`item_template` , `".$characters_db[$realm_id]['name']."`.`auctionhouse` LEFT JOIN `".$characters_db[$realm_id]['name']."`.`characters` c2 ON `c2`.`guid`=`auctionhouse`.`buyguid` WHERE `auctionhouse`.`itemowner`=`characters`.`guid` AND `item_instance`.`itemEntry`=`item_template`.`entry` AND `auctionhouse`.`itemguid`=`item_instance`.`guid` $search_filter $order_side");
+        $query_1 = $sqlc->query("SELECT count(*) 
+                                FROM `auctionhouse` 
+                                    LEFT JOIN `characters` ON (`auctionhouse`.`itemowner` = `characters`.`guid`)
+                                    LEFT JOIN `item_instance` ON (`auctionhouse`.`itemguid` = `item_instance`.`guid`) 
+                                    LEFT JOIN `".$world_db[$realm_id]['name']."`.`item_template` ON (`".$world_db[$realm_id]['name']."`.`item_template`.`entry` = `item_instance`.`itemEntry`) 
+                                    LEFT JOIN `characters` c2 ON `c2`.`guid`=`auctionhouse`.`buyguid` 
+                                WHERE 1=1 $search_filter $order_side");
     }
     else
     {
         $query_1 = $sqlc->query("SELECT count(*) FROM auctionhouse");
-    }
-    if($search_filter !== ''){
-        $search_filter = 'WHERE 1=1 ' . $search_filter;
-    }
-    if($search_filter === '' && $order_side !== ''){
-        $order_side = 'WHERE 1=1 ' . $order_side;
     }
     $result = $sqlc->query("SELECT 
                                 BINARY `characters`.`name` AS `seller`, 
@@ -202,7 +201,7 @@ function browse_auctions(SQL &$sqlr, SQL &$sqlc)
                                 LEFT JOIN `item_instance` ON (`auctionhouse`.`itemguid` = `item_instance`.`guid`) 
                                 LEFT JOIN `".$world_db[$realm_id]['name']."`.`item_template` ON (`".$world_db[$realm_id]['name']."`.`item_template`.`entry` = `item_instance`.`itemEntry`) 
                                 LEFT JOIN `characters` c2 ON `c2`.`guid`=`auctionhouse`.`buyguid` 
-                             $search_filter $order_side ORDER BY `auctionhouse`.`$order_by` $order_dir LIMIT $start, $itemperpage");
+                            WHERE 1=1 $search_filter $order_side ORDER BY `auctionhouse`.`$order_by` $order_dir LIMIT $start, $itemperpage");
     $all_record = $sqlc->result($query_1,0);
 
     //=====================top tage navigaion starts here========================
@@ -287,11 +286,9 @@ function browse_auctions(SQL &$sqlr, SQL &$sqlc)
                     <th width=\"15%\"><a href=\"ahstats.php?order_by=startbid&amp;start=$start".( (($search_by && $search_value) || ($search_class != -1) || ($search_quality != -1)) ? "&amp;search_by=$search_by&amp;search_value=$search_value&amp;search_quality=$search_quality&amp;search_class=$search_class&amp;error=2" : "" )."&amp;dir=$dir\">".($order_by=='startbid' ? "<img src=\"img/arr_".($dir ? "up" : "dw").".gif\" alt=\"\" /> " : "")."{$lang_auctionhouse['firstbid']}</a></th>
                 </tr>";
 
-    global $mmfpm_db, $world_db;
+    global $mmfpm_db;
     $sqlm = new SQL;
     $sqlm->connect($mmfpm_db['addr'], $mmfpm_db['user'], $mmfpm_db['pass'], $mmfpm_db['name']);
-    $sqlw = new SQL;
-    $sqlw->connect($world_db[$realm_id]['addr'], $world_db[$realm_id]['user'], $world_db[$realm_id]['pass'], $world_db[$realm_id]['name']);
 
     while ($rows = $sqlc->fetch_row($result))
     {
@@ -324,13 +321,14 @@ function browse_auctions(SQL &$sqlr, SQL &$sqlc)
                     $value = "<b>".((!empty($rows[9])) ? "<font color=".$sidecolor[$rows[9]].">".htmlentities($value)."</font>" : "N/A")."</b>";
                     break;
             }
-            if (!in_array($row,$hiddencols))
-            $output .= "
+            if (!in_array($row,$hiddencols)) {
+                $output .= "
                     <td>
                         <center>
-                        ".$value."
+                        " . $value . "
                         </center>
                     </td>";
+            }
         }
         $output .= "
                 </tr>";
@@ -352,7 +350,7 @@ function browse_auctions(SQL &$sqlr, SQL &$sqlc)
 //#############################################################################
 // MAIN
 //#############################################################################
-$err = (isset($_GET['error'])) ? $_GET['error'] : NULL;
+$err = $_GET['error'] ?? null;
 
 $output .= "
     <div class=\"top\">";
@@ -382,11 +380,13 @@ unset($err);
 
 $output .= "
     </div>";
-browse_auctions($sqlr, $sqlc);
+
+$sqlw = new SQL;
+$sqlw->connect($world_db[$realm_id]['addr'], $world_db[$realm_id]['user'], $world_db[$realm_id]['pass'], $world_db[$realm_id]['name']);
+
+browse_auctions($sqlr, $sqlc, $sqlw);
 
 unset($action);
 unset($action_permission);
 unset($lang_auctionhouse);
 require_once("footer.php");
-
-?>
