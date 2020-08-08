@@ -143,7 +143,7 @@ function edit_user(&$sqlr, &$sqlc)
         else
         {
             $result = $sqlc->query('SELECT characters.guid, BINARY characters.name AS name, race, class, level, gender, guild.name AS gname FROM characters LEFT JOIN guild_member
-                                    ON characters.guid = guild_member.guid LEFT JOIN guild ON guild_member.guildid = guild.guildid WHERE WHERE account = '.$user_id.'');
+                                    ON characters.guid = guild_member.guid LEFT JOIN guild ON guild_member.guildid = guild.guildid WHERE account = '.$user_id.'');
 
             $output .= '
                                 <tr>

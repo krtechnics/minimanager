@@ -882,7 +882,7 @@ function edit_user()
                 {
                     $output .= "
                                                 <option value=\"{$level[0]}\" ";
-                    if ($data['gmlevel'] == $level[0])
+                    if ($data['SecurityLevel'] == $level[0])
                         $output .= "selected=\"selected\" ";
                     $output .= ">{$level[1]}</option>";
                 }
