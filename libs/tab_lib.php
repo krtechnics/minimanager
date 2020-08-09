@@ -382,15 +382,15 @@ $tab_del_guild = [
 $tab_del_arena = [
     [
         'arena_team',
-        'arenateamid',
+        'arenaTeamId',
     ],
-    [
-        'arena_team_stats',
-        'arenateamid',
-    ],
+//    [
+//        'arena_team_stats',
+//        'arenateamid',
+//    ],
     [
         'arena_team_member',
-        'arenateamid',
+        'arenaTeamId',
     ],
 ];
 

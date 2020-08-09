@@ -758,6 +758,7 @@ function docleanup(){
     $deleted_acc = 0;
     $deleted_chars = 0;
     $deleted_gulds = 0;
+    $deleted_arenateams = 0;
 
     require_once("./libs/del_lib.php");
 
@@ -769,7 +770,7 @@ function docleanup(){
             {
                 if ($check[$i] != "" )
                 {
-                    list($flag,$del_char) = del_acc($check[$i]);
+                    [$flag,$del_char] = del_acc($check[$i]);
                     if ($flag)
                     {
                         $deleted_acc++;
@@ -805,13 +806,14 @@ function docleanup(){
 
         //cleaning arena teams
         case "arenateam":
-            for ($i = 1; $i < count($check); $i++)
+            for ($i = 1, $iMax = count($check); $i < $iMax; $i++)
             {
-                if ($check[$i] != "" )
-                {
-                    if (del_arenateam($check[$i], $realm_id))
+                if ($check[$i] != "" && del_arenateam(
+                        $check[$i],
+                        $realm_id
+                    )) {
                         $deleted_arenateams++;
-                }
+                    }
             }
         break;
 

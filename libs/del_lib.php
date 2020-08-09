@@ -164,22 +164,29 @@ function del_guild($guid, $realm)
 //Delete Arena Team
 function del_arenateam($guid, $realm)
 {
-    global	$characters_db,
-            $tab_del_arena;
+    global $characters_db,
+           $tab_del_arena;
 
     $sqlc = new SQL;
-    $sqlc->connect($characters_db[$realm]['addr'], $characters_db[$realm]['user'], $characters_db[$realm]['pass'], $characters_db[$realm]['name']);
+    $sqlc->connect(
+        $characters_db[$realm]['addr'],
+        $characters_db[$realm]['user'],
+        $characters_db[$realm]['pass'],
+        $characters_db[$realm]['name']
+    );
 
-    foreach ($tab_del_arena as $value)
-        $sqlr->query('DELETE 
-                    FROM '.$value[0].' 
-                    WHERE '.$value[1].' = '.$guid.'');
+    foreach ($tab_del_arena as $value) {
+        $sqlc->query(
+            'DELETE 
+                        FROM ' . $value[0] . ' 
+                        WHERE ' . $value[1] . ' = ' . $guid . ''
+        );
+    }
 
-    if ($sqlc->affected_rows())
+    if ($sqlc->affected_rows()) {
         return true;
-    else
-        return false;
-
+    }
+    return false;
 }
 
 

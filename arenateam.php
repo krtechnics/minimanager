@@ -15,16 +15,21 @@ function browse_teams()
 
     //==========================$_GET and SECURE=================================
     $start = (isset($_GET['start'])) ? $sqlc->quote_smart($_GET['start']) : 0;
-    if (is_numeric($start));
-    else $start=0;
+    if (!is_numeric($start)){
+        $start=0;
+    }
 
     $order_by = (isset($_GET['order_by'])) ? $sqlc->quote_smart($_GET['order_by']) : "atid";
-    if (!preg_match("/^[_[:lower:]]{1,17}$/", $order_by))
+    if (!preg_match("/^[_[:lower:]]{1,17}$/", $order_by)){
         $order_by="atid";
+    }
+
 
     $dir = (isset($_GET['dir'])) ? $sqlc->quote_smart($_GET['dir']) : 1;
-    if (!preg_match("/^[01]{1}$/", $dir))
+    if (!preg_match("/^[01]{1}$/", $dir)){
         $dir=1;
+    }
+
 
     $order_dir = ($dir) ? "ASC" : "DESC";
     $dir = ($dir) ? 0 : 1;
@@ -36,41 +41,77 @@ function browse_teams()
     {
         $search_value = $sqlc->quote_smart($_GET['search_value']);
         $search_by = $sqlc->quote_smart($_GET['search_by']);
-        $search_menu = array('atname', 'leadername', 'atid');
-
-        if (!in_array($search_by, $search_menu))
-            $search_by = 'atid';
 
         switch($search_by)
         {
             case "atname":
-                $query = $sqlc->query("SELECT art.`arenateamid` as atid, art.`name` as atname, art.`captainguid` as lguid, art.`type` as attype, BINARY cCaptain.`name` as lname, COUNT(atm.`arenateamid`) as tot_chars, art.`rating` as atrating, art.`seasonGames` as atgames, art.`seasonWins` as atwins FROM `arena_team` art
-                LEFT JOIN `characters` cCaptain on art.`captainguid` = cCaptain.`guid`
-                RIGHT JOIN `arena_team_member` atm on atm.`arenateamid` = art.`arenateamid`
-                WHERE art.`name` LIKE '%$search_value%' GROUP BY atid ORDER BY $order_by $order_dir LIMIT $start, $itemperpage");
+                $query = $sqlc->query("SELECT 
+                                            art.`arenateamid` as atid, 
+                                            art.`name` as atname, 
+                                            art.`captainguid` as lguid, 
+                                            art.`type` as attype, 
+                                            BINARY cCaptain.`name` as lname, 
+                                            COUNT(atm.`arenateamid`) as tot_chars, 
+                                            art.`rating` as atrating, 
+                                            art.`seasonGames` as atgames, 
+                                            art.`seasonWins` as atwins
+                                       FROM `arena_team` art
+                                          LEFT JOIN `characters` cCaptain on art.`captainguid` = cCaptain.`guid`
+                                          LEFT JOIN `arena_team_member` atm on atm.`arenateamid` = art.`arenateamid`
+                                       WHERE art.`name` LIKE '%$search_value%' 
+                                       GROUP BY atid, atname, lguid, attype, lname, atrating, atgames,atwins 
+                                       ORDER BY $order_by $order_dir
+                                       LIMIT $start, $itemperpage");
                 $query_1 = $sqlc->query("SELECT count(*) FROM arena_team WHERE arena_team.name LIKE '%$search_value%'");
                 break;
             case "leadername":
-                $query = $sqlc->query("SELECT art.`arenateamid` as atid, art.`name` as atname, art.`captainguid` as lguid, art.`type` as attype, BINARY cCaptain.`name` as lname, COUNT(atm.`arenateamid`) as tot_chars, art.`rating` as atrating, art.`seasonGames` as atgames, art.`seasonWins` as atwins FROM `arena_team` art
-                LEFT JOIN `characters` cCaptain on art.`captainguid` = cCaptain.`guid`
-                RIGHT JOIN `arena_team_member` atm on atm.`arenateamid` = art.`arenateamid`
-                WHERE cCaptain.`name` LIKE '%$search_value%' GROUP BY atid ORDER BY $order_by $order_dir LIMIT $start, $itemperpage");
+                $query = $sqlc->query("SELECT 
+                                            art.`arenateamid` as atid, 
+                                            art.`name` as atname, 
+                                            art.`captainguid` as lguid, 
+                                            art.`type` as attype, 
+                                            BINARY cCaptain.`name` as lname, 
+                                            COUNT(atm.`arenateamid`) as tot_chars, 
+                                            art.`rating` as atrating, 
+                                            art.`seasonGames` as atgames, 
+                                            art.`seasonWins` as atwins
+                                       FROM `arena_team` art
+                                            LEFT JOIN `characters` cCaptain on art.`captainguid` = cCaptain.`guid`
+                                            LEFT JOIN `arena_team_member` atm on atm.`arenateamid` = art.`arenateamid`
+                                       WHERE cCaptain.`name` LIKE '%$search_value%' 
+                                       GROUP BY atid, atname, lguid, attype, lname, atrating, atgames,atwins
+                                       ORDER BY $order_by $order_dir
+                                       LIMIT $start, $itemperpage");
                 $query_1 = $sqlc->query("SELECT count(*) FROM arena_team WHERE arena_team.captainguid in (SELECT guid from characters where name like '%$search_value%')");
                 break;
             case "atid":
-                $query = $sqlc->query("SELECT art.`arenateamid` as atid, art.`name` as atname, art.`captainguid` as lguid, art.`type` as attype, BINARY cCaptain.`name` as lname, COUNT(atm.`arenateamid`) as tot_chars, art.`rating` as atrating, art.`seasonGames` as atgames, art.`seasonWins` as atwins, COUNT(cOnlineCount.`guid`) as arenateam_online
-                                               FROM `arena_team` art
-                                               LEFT JOIN `characters` cCaptain on art.`captainguid` = cCaptain.`guid`
-                                               RIGHT JOIN `arena_team_member` atm on atm.`arenateamid` = art.`arenateamid`
-                                               LEFT JOIN (SELECT `guid` FROM `characters` WHERE `online` = 1) cOnlineCount on cOnlineCount.`guid` = atm.`guid`
-                                               GROUP BY atid ORDER BY $order_by $order_dir LIMIT $start, $itemperpage");
+            default:
+                $query = $sqlc->query("SELECT 
+                                            art.`arenateamid` as atid, 
+                                            art.`name` as atname, 
+                                            art.`captainguid` as lguid, 
+                                            art.`type` as attype, 
+                                            BINARY cCaptain.`name` as lname, 
+                                            COUNT(atm.`arenateamid`) as tot_chars, 
+                                            art.`rating` as atrating, 
+                                            art.`seasonGames` as atgames, 
+                                            art.`seasonWins` as atwins
+                                       FROM `arena_team` art
+                                            LEFT JOIN `characters` cCaptain on art.`captainguid` = cCaptain.`guid`
+                                            LEFT JOIN `arena_team_member` atm on atm.`arenateamid` = art.`arenateamid`
+                                       GROUP BY atid, atname, lguid, attype, lname, atrating, atgames,atwins
+                                       ORDER BY $order_by $order_dir 
+                                       LIMIT $start, $itemperpage");
                 $query_1 = $sqlc->query("SELECT count(*) FROM arena_team arena_team.arenateamid ='$search_value'");
                 break;
         }
     }
     else
     {
-        $query = $sqlc->query("SELECT arena_team.arenateamid AS atid, arena_team.name AS atname, arena_team.captainguid AS lguid, arena_team.type AS attype, (SELECT BINARY NAME FROM `characters` WHERE guid = lguid) AS lname,(SELECT COUNT(*) FROM  arena_team_member WHERE arenateamid = atid) AS tot_chars, rating AS atrating, seasonGames AS atgames, seasonWins AS atwins, (SELECT COUNT(*) AS GCNT  FROM `arena_team_member`, `characters`, `arena_team` WHERE arena_team.arenateamid = atid AND arena_team_member.arenateamid = arena_team.arenateamid AND arena_team_member.guid = characters.guid AND characters.online = 1) AS arenateam_online FROM arena_team ORDER BY $order_by $order_dir LIMIT $start, $itemperpage");
+        $query = $sqlc->query("SELECT arena_team.arenateamid AS atid, arena_team.name AS atname, arena_team.captainguid AS lguid, arena_team.type AS attype, (SELECT BINARY NAME FROM `characters` WHERE guid = lguid) AS lname,(SELECT COUNT(*) FROM  arena_team_member WHERE arenateamid = atid) AS tot_chars, rating AS atrating, seasonGames AS atgames, seasonWins AS atwins, (SELECT COUNT(*) AS GCNT  FROM `arena_team_member`, `characters`, `arena_team` WHERE arena_team.arenateamid = atid AND arena_team_member.arenateamid = arena_team.arenateamid AND arena_team_member.guid = characters.guid AND characters.online = 1) AS arenateam_online 
+                               FROM arena_team
+                               ORDER BY $order_by $order_dir
+                               LIMIT $start, $itemperpage");
         $query_1 = $sqlc->query("SELECT count(*) FROM arena_team");
     }
 
@@ -174,15 +215,13 @@ function count_days( $a, $b ) {
 //########################################################################################################################
 // VIEW ARENA TEAM
 //########################################################################################################################
-function view_team()
+function view_team(SQL $sqlr, SQL $sqlc)
 {
-    global $lang_arenateam, $lang_global, $output, $characters_db, $realm_id, $realm_db, $mmfpm_db, $action_permission, $user_lvl, $user_id, $showcountryflag;
+    global $lang_arenateam, $lang_global, $output, $realm_db, $action_permission, $user_lvl, $user_id, $showcountryflag;
 
-    if(!isset($_GET['id']))
+    if(!isset($_GET['id'])){
         redirect("arenateam.php?error=1");
-
-    $sqlc = new SQL;
-    $sqlc->connect($characters_db[$realm_id]['addr'], $characters_db[$realm_id]['user'], $characters_db[$realm_id]['pass'], $characters_db[$realm_id]['name']);
+    }
     $arenateam_id = $sqlc->quote_smart($_GET['id']);
     $query = $sqlc->query("SELECT arenateamid, name, type FROM arena_team WHERE arenateamid = '$arenateam_id'");
     $arenateam_data = $sqlc->fetch_row($query);
@@ -198,16 +237,18 @@ function view_team()
     $members = $sqlc->query("SELECT arena_team_member.guid,BINARY characters.name AS name, arena_team_member.personalRating, level, arena_team_member.weekGames, arena_team_member.weekWins, arena_team_member.seasonGames, arena_team_member.seasonWins, characters.race, characters.class, characters.online, characters.account, characters.logout_time, gender, account FROM arena_team_member,characters LEFT JOIN arena_team_member k1 ON k1.guid=characters.guid AND k1.arenateamid='$arenateam_id' WHERE arena_team_member.arenateamid = '$arenateam_id' AND arena_team_member.guid=characters.guid ORDER BY characters.name");
     $total_members = $sqlc->num_rows($members);
     $losses_week = $arenateamstats_data[2]-$arenateamstats_data[3];
-    if($arenateamstats_data[2])
+    if($arenateamstats_data[2]) {
         $winperc_week = round((10000 * $arenateamstats_data[3]) / $arenateamstats_data[2]) / 100;
-    else
+    } else {
         $winperc_week = $arenateamstats_data[2];
+    }
     $losses_season = $arenateamstats_data[4]-$arenateamstats_data[5];
 
-    if($arenateamstats_data[4])
+    if($arenateamstats_data[4]) {
         $winperc_season = round((10000 * $arenateamstats_data[5]) / $arenateamstats_data[4]) / 100;
-    else
+    } else {
         $winperc_season = $arenateamstats_data[4];
+    }
 
     $output .= "
         <script type=\"text/javascript\">
@@ -259,13 +300,7 @@ function view_team()
     if ($showcountryflag)
     {
         require_once 'libs/misc_lib.php';
-
-        $sqlr = new SQL;
-        $sqlr->connect($realm_db['addr'], $realm_db['user'], $realm_db['pass'], $realm_db['name']);
-        $sqlm = new SQL;
-        $sqlm->connect($mmfpm_db['addr'], $mmfpm_db['user'], $mmfpm_db['pass'], $mmfpm_db['name']);
-        $output .="
-                        <th width=\"1%\">{$lang_global['country']}</th>";
+        $output .="<th width=\"1%\">{$lang_global['country']}</th>";
     }
 
     $output .="
@@ -274,23 +309,22 @@ function view_team()
     while ($member = $sqlc->fetch_row($members))
     {
         $accid = $member[11];
-        $output .= "
-                    <tr>";
-        if($user_lvl >= $action_permission['delete'] || $accid == $user_id)
-            $output .= "
-                        <td><img src=\"img/aff_cross.png\" alt=\"\" onclick=\"answerBox('{$lang_global['delete']}: <font color=white>{$member[1]}</font><br />{$lang_global['are_you_sure']}', 'arenateam.php?action=rem_char_from_team&amp;id=$member[0]&amp;arenateam_id=$arenateam_id');\" style=\"cursor:pointer;\" /></td>";
-        else
-            $output .= "
-                        <td>&nbsp;</td>";
-        if($member[4])
+        $output .= "<tr>";
+        if($user_lvl >= $action_permission['delete'] || $accid == $user_id) {
+            $output .= "<td><img src=\"img/aff_cross.png\" alt=\"\" onclick=\"answerBox('{$lang_global['delete']}: <font color=white>{$member[1]}</font><br />{$lang_global['are_you_sure']}', 'arenateam.php?action=rem_char_from_team&amp;id=$member[0]&amp;arenateam_id=$arenateam_id');\" style=\"cursor:pointer;\" /></td>";
+        }else {
+            $output .= "<td>&nbsp;</td>";
+        }
+        if($member[4]) {
             $ww_pct = round((10000 * $member[5]) / $member[4]) / 100;
-        else
+        } else {
             $ww_pct = $member[4];
-
-        if($member[6])
+        }
+        if($member[6]) {
             $ws_pct = round((10000 * $member[7]) / $member[6]) / 100;
-        else
+        } else {
             $ws_pct = $member[6];
+        }
 
         $output .= "
                         <td><a href=\"char.php?id=$member[0]\">".htmlentities($member[1])."</a></td>
@@ -308,13 +342,12 @@ function view_team()
 
         if ($showcountryflag)
         {
-            $country = misc_get_country_by_account($member[14], $sqlr, $sqlm);
+            $country = misc_get_country_by_account($member[14], $sqlr);
             $output .="
                         <td>".(($country['code']) ? "<img src='img/flags/".$country['code'].".png' onmousemove='toolTip(\"".($country['country'])."\",\"item_tooltip\")' onmouseout='toolTip()' alt=\"\" />" : "-")."</td>";
         }
 
-        $output .="
-                    </tr>";
+        $output .="</tr>";
     }
 
     $output .= "
@@ -359,10 +392,11 @@ function del_team()
 {
     global $lang_arenateam, $lang_global, $output;
 
-    if(isset($_GET['id']))
+    if(isset($_GET['id'])){
         $id = $_GET['id'];
-    else
+    } else {
         redirect("arenateam.php?error=1");
+    }
 
     $output .= "
         <center>
@@ -394,25 +428,30 @@ function del_team()
 //##########################################################################################
 //REMOVE CHAR FROM TEAM
 //##########################################################################################
-function rem_char_from_team()
+function rem_char_from_team(SQL $sqlc)
 {
-    global $characters_db, $realm_id, $user_lvl;
+    global $characters_db, $realm_id, $user_lvl, $action_permission, $user_id;
 
-    if(isset($_GET['id']))
-        $guid = $_GET['id'];
-    else
+    if(isset($_GET['id'])) {
+        $guid = $sqlc->quote_smart($_GET['id']);
+    }else {
         redirect("arenateam.php?error=1");
+    }
 
-    if(isset($_GET['arenateam_id']))
-        $arenateam_id = $_GET['arenateam_id'];
-    else
+    if(isset($_GET['arenateam_id'])) {
+        $arenateam_id = $sqlc->quote_smart($_GET['arenateam_id']);
+    }else {
         redirect("arenateam.php?error=1");
+    }
 
-    $sqlc = new SQL;
-    $sqlc->connect($characters_db[$realm_id]['addr'], $characters_db[$realm_id]['user'], $characters_db[$realm_id]['pass'], $characters_db[$realm_id]['name']);
+    $query = $sqlc->query("SELECT account FROM characters WHERE guid = '$guid'");
+    $accountID = $sqlc->result($query,0);
 
+    if($user_lvl >= $action_permission['delete'] || $accountID == $user_id) {
+        $sqlc->query("DELETE FROM arena_team_member WHERE guid = '$guid' AND arenaTeamId = '$arenateam_id'");
+    }
     // must be checked that this user can delete it
-    //$sql->query("DELETE FROM arena_team_member WHERE guid = '$guid'");
+
 
     redirect("arenateam.php?action=view_team&id=$arenateam_id");
 }
@@ -420,7 +459,7 @@ function rem_char_from_team()
 //########################################################################################################################
 // MAIN
 //########################################################################################################################
-$err = (isset($_GET['error'])) ? $_GET['error'] : NULL;
+$err = $_GET['error'] ?? null;
 
 $output .= "
     <div class=\"top\">";
@@ -457,21 +496,20 @@ switch ($err)
 $output .= "
     </div>";
 
-$action = (isset($_GET['action'])) ? $_GET['action'] : NULL;
+$action = $_GET['action'] ?? null;
 
 switch ($action)
 {
     case "view_team":
-        view_team();
+        view_team($sqlr, $sqlc);
         break;
     case "del_team":
         del_team();
         break;
     case "rem_char_from_team":
-        rem_char_from_team();
+        rem_char_from_team($sqlc);
         break;
     default:
         browse_teams();
 }
 require_once("footer.php");
-?>

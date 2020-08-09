@@ -425,7 +425,7 @@ function view_guild()
 
         if ($showcountryflag)
         {
-            $country = misc_get_country_by_account($member[11], $sqlr, $sqlm);
+            $country = misc_get_country_by_account($member[11], $sqlr);
             $output .="
                                                 <td>".(($country['code']) ? "<img src='img/flags/".$country['code'].".png' onmousemove='toolTip(\"".($country['country'])."\",\"item_tooltip\")' onmouseout='toolTip()' alt=\"\" />" : "-")."</td>";
         }

@@ -8,15 +8,11 @@ valid_login($action_permission['read']);
 //########################################################################################################################
 //  BROWSE CHARS
 //########################################################################################################################
-function browse_chars(&$sqlr, &$sqlc)
+function browse_chars(&$sqlr, &$sqlc, $sqlm)
 {
     global $output, $lang_char_list, $lang_global,
-            $realm_db, $mmfpm_db, $characters_db, $realm_id,
-            $action_permission, $user_lvl, $user_name,
+            $mmfpm_db, $action_permission, $user_lvl, $user_name,
             $showcountryflag, $itemperpage;
-
-    $sqlm = new SQL;
-    $sqlm->connect($mmfpm_db['addr'], $mmfpm_db['user'], $mmfpm_db['pass'], $mmfpm_db['name']);
 
     //==========================$_GET and SECURE========================
     $start = (isset($_GET['start'])) ? $sqlr->quote_smart($_GET['start']) : 0;
@@ -293,7 +289,7 @@ function browse_chars(&$sqlr, &$sqlc)
     {
         $char = $sqlr->fetch_row($query) or die(error($lang_global['err_no_user']));
         // to disalow lower lvl gm to  view accounts of other gms
-        $result = $sqlr->query("SELECT `account_access`.SecurityLevel AS`gmlevel`, `account`.`username` FROM account LEFT JOIN account_access ON account.id=account_access.id WHERE account.id ='$char[2]'");
+        $result = $sqlr->query("SELECT `account_access`.SecurityLevel AS`gmlevel`, `account`.`username` FROM account LEFT JOIN account_access ON account.id=account_access.AccountID WHERE account.id ='$char[2]'");
         $acc = $sqlr->fetch_assoc($result);
         $owner_gmlvl = $acc['gmlevel'];
 
@@ -335,7 +331,7 @@ function browse_chars(&$sqlr, &$sqlc)
                                 <td>".(($char[7]) ? "<img src=\"img/up.gif\" alt=\"\" />" : "-")."</td>";
             if ($showcountryflag)
             {
-                $country = misc_get_country_by_account($char[2], $sqlr, $sqlm);
+                $country = misc_get_country_by_account($char[2], $sqlr);
                 $output .= "
                                 <td>".((ctype_alpha($country['code'])) ? "<img src='img/flags/".$country['code'].".png' onmousemove='toolTip(\"".($country['country'])."\",\"item_tooltip\")' onmouseout='toolTip()' alt=\"\" />" : "-")."</td>";
             }
@@ -552,7 +548,7 @@ unset($err);
 $output .= '
         </div>';
 
-$action = (isset($_GET['action'])) ? $_GET['action'] : NULL;
+$action = $_GET['action'] ?? null;
 
 switch ($action)
 {
@@ -565,7 +561,7 @@ switch ($action)
         break;
 
     default:
-        browse_chars($sqlr, $sqlc);
+        browse_chars($sqlr, $sqlc, $sqlm);
 }
 
 unset($action);

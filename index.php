@@ -288,7 +288,7 @@ function front(&$sqlr, &$sqlc, &$sqlm)
                             <td><span onmousemove="toolTip(\'ZoneID:'.$char['zone'].'\', \'item_tooltip\')" onmouseout="toolTip()">'.get_zone_name($char['zone'], $sqlm).'</span></td>';
             if ($showcountryflag)
             {
-                $country = misc_get_country_by_account($char['account'], $sqlr, $sqlm);
+                $country = misc_get_country_by_account($char['account'], $sqlr);
                 $output .='
                             <td>'.(($country['code']) ? '<img src="img/flags/'.$country['code'].'.png" onmousemove="toolTip(\''.($country['country']).'\',\'item_tooltip\')" onmouseout="toolTip()" alt="" />' : '-').'</td>';
             }
