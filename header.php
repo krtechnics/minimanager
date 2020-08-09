@@ -50,8 +50,6 @@ foreach ($_GET as $key => $value)
 foreach ($_COOKIE as $key => $value)
     $_COOKIE[$key] = $sqlm->quote_smart($value);
 
-$sqlm->close();
-unset($sqlm);
 // End
 
 //---------------------Loading User Theme and Language Settings----------------
