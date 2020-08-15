@@ -35,7 +35,9 @@ function char_extra(&$sqlr, &$sqlc, &$sqlw)
         $owner_name = $sqlr->result($result, 0, 'username');
         $owner_gmlvl = $sqlr->result($result, 0, 'gmlevel');
         if (empty($owner_gmlvl))
+        {
             $owner_gmlvl = 0;
+        }
 
         if (($user_lvl > $owner_gmlvl)||($owner_name === $user_name))
         {
@@ -65,22 +67,22 @@ function char_extra(&$sqlr, &$sqlc, &$sqlw)
             while($bag = $sqlw->fetch_assoc($result))
             {
                 $result_2 = $sqlc->query('SELECT guid as item, itemEntry FROM item_instance WHERE owner_guid = '.$id.' AND itemEntry = '.$bag['entry'].' ');
-                while ($char = $sqlc->fetch_assoc($result_2))
+                while ($char1 = $sqlc->fetch_assoc($result_2))
                 {
-                    $result_3 = $sqlc->query('SELECT count AS item FROM item_instance WHERE guid = '.$char['item'].' ');
+                    $result_3 = $sqlc->query('SELECT count AS item FROM item_instance WHERE guid = '.$char1['item'].' ');
                     $items = $sqlc->fetch_row($result_3);
                     $output .= '
                         <tr valign="center">
                             <td>
-                                <a style="padding:2px;" href="'.$item_datasite.$char['itemEntry'].'" target="_blank">
-                                    <img src="'.get_item_icon($char['itemEntry'], $sqlm).'" alt="'.$char['itemEntry'].'" class="icon_border_0" />
+                                <a style="padding:2px;" href="'.$item_datasite.$char1['itemEntry'].'" target="_blank">
+                                    <img src="'.get_item_icon($char1['itemEntry'], $sqlm,$sqlw).'" alt="'.$char1['itemEntry'].'" class="icon_border_0" />
                                 </a>
                             </td>
                             <td>
                                 '.$items['0'].'
                             </td>
                             <td>
-                                <span onmousemove="toolTip(\''.$bag['description'].'\', \'item_tooltip\')" onmouseout="toolTip()">'.get_item_name($char['itemEntry'], $sqlw).'</span>
+                                <span onmousemove="toolTip(\''.$bag['description'].'\', \'item_tooltip\')" onmouseout="toolTip()">'.get_item_name($char1['itemEntry'], $sqlw).'</span>
                             </td>
                         </tr>';
                 }
@@ -105,11 +107,14 @@ function char_extra(&$sqlr, &$sqlc, &$sqlw)
             </center>';
 
         }
-        else
+        else{
             error($lang_char['no_permission']);
+        }
+
     }
-    else
+    else {
         error($lang_char['no_char_found']);
+    }
 }
 unset($char);
 
@@ -138,5 +143,3 @@ unset($lang_char);
 
 require_once 'footer.php';
 
-
-?>
