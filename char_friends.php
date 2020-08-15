@@ -9,7 +9,7 @@ valid_login($action_permission['read']);
 //########################################################################################################################
 // SHOW CHARACTERS ACHIEVEMENTS
 //########################################################################################################################
-function char_friends(&$sqlr, &$sqlc)
+function char_friends(&$sqlr, &$sqlc, SQL $sqlm)
 {
     global $output, $lang_global, $lang_char,
             $realm_id, $realm_db, $mmfpm_db, $characters_db,
@@ -19,23 +19,27 @@ function char_friends(&$sqlr, &$sqlc)
 
     //==========================$_GET and SECURE========================
     $order_by = (isset($_GET['order_by'])) ? $sqlc->quote_smart($_GET['order_by']) : 'name';
-    if (preg_match('/^[[:lower:]]{1,6}$/', $order_by));
-    else
+    if (!preg_match('/^[[:lower:]]{1,6}$/', $order_by)){
         $order_by = 'name';
+    }
+
 
     $dir = (isset($_GET['dir'])) ? $sqlc->quote_smart($_GET['dir']) : 1;
-    if (preg_match('/^[01]{1}$/', $dir));
-    else
+    if (!preg_match('/^[01]{1}$/', $dir)) {
         $dir = 1;
+    }
+
 
     $order_dir = ($dir) ? 'ASC' : 'DESC';
     $dir = ($dir) ? 0 : 1;
     //==========================$_GET and SECURE end========================
 
-    if ($order_by === 'map')
+    if ($order_by === 'map'){
         $order_by = 'map '.$order_dir.', zone';
-    elseif ($order_by === 'zone')
+    } elseif ($order_by === 'zone'){
         $order_by = 'zone '.$order_dir.', map';
+    }
+
 
     // getting character data from database
     $result = $sqlc->query('SELECT account, BINARY name AS name, race, class, level, gender
@@ -50,8 +54,10 @@ function char_friends(&$sqlr, &$sqlc)
         $result = $sqlr->query('SELECT username, SecurityLevel AS gmlevel FROM account LEFT JOIN account_access ON account.id=account_access.AccountID WHERE `account`.`id` = '.$owner_acc_id.' ORDER BY `gmlevel` DESC LIMIT 1');
         $owner_name = $sqlr->result($result, 0, 'username');
         $owner_gmlvl = $sqlr->result($result, 0, 'gmlevel');
-        if (empty($owner_gmlvl))
+        if (empty($owner_gmlvl)){
             $owner_gmlvl = 0;
+        }
+
 
         if (($user_lvl > $owner_gmlvl)||($owner_name === $user_name))
         {
@@ -73,9 +79,6 @@ function char_friends(&$sqlr, &$sqlc)
                             <tr valign="top">
                                 <td>
                                     <table class="lined" style="width: 1%;">';
-
-            $sqlm = new SQL;
-            $sqlm->connect($mmfpm_db['addr'], $mmfpm_db['user'], $mmfpm_db['pass'], $mmfpm_db['name']);
 
             $result = $sqlc->query('SELECT BINARY name AS name, race, class, map, zone, level, gender, online, account, guid
                                     FROM characters WHERE guid in (SELECT friend FROM character_social WHERE guid = '.$id.' and flags <= 1) ORDER BY '.$order_by.' '.$order_dir.'');
@@ -101,11 +104,13 @@ function char_friends(&$sqlr, &$sqlc)
                     $output .= '
                                         <tr>
                                             <td>';
-                    if ($user_lvl >= $char_gm_level)
+                    if ($user_lvl >= $char_gm_level){
                         $output .= '
                                                 <a href="char.php?id='.$data['guid'].'">'.$data['name'].'</a>';
-                    else
+                    } else {
                         $output .= $data['name'];
+                    }
+
 
                     $output .='
                                             </td>
@@ -143,11 +148,12 @@ function char_friends(&$sqlr, &$sqlc)
                     $output .= '
                                         <tr>
                                             <td>';
-                    if ($user_lvl >= $char_gm_level)
+                    if ($user_lvl >= $char_gm_level){
                         $output .= '
                                                 <a href="char.php?id='.$data['guid'].'">'.$data['name'].'</a>';
-                    else
+                    } else {
                         $output .= $data['name'];
+                    }
                     $output .='
                                             </td>
                                             <td><img src="img/c_icons/'.$data['race'].'-'.$data['gender'].'.gif" onmousemove="toolTip(\''.char_get_race_name($data['race']).'\', \'item_tooltip\')" onmouseout="toolTip()" alt="" /></td>
@@ -192,11 +198,12 @@ function char_friends(&$sqlr, &$sqlc)
                     $output .= '
                                         <tr>
                                             <td>';
-                    if ($user_lvl >= $char_gm_level)
+                    if ($user_lvl >= $char_gm_level){
                         $output .= '
                                                 <a href="char.php?id='.$data['guid'].'">'.$data['name'].'</a>';
-                    else
+                    } else {
                         $output .= $data['name'];
+                    }
                     $output .='
                                             </td>
                                             <td><img src="img/c_icons/'.$data['race'].'-'.$data['gender'].'.gif" onmousemove="toolTip(\''.char_get_race_name($data['race']).'\', \'item_tooltip\')" onmouseout="toolTip()" alt="" /></td>
@@ -233,11 +240,13 @@ function char_friends(&$sqlr, &$sqlc)
                     $output .= '
                                         <tr>
                                             <td>';
-                    if ($user_lvl >= $char_gm_level)
+                    if ($user_lvl >= $char_gm_level){
                         $output .= '
                                                 <a href="char.php?id='.$data['guid'].'">'.$data['name'].'</a>';
-                    else
+                    } else{
                         $output .= $data['name'];
+                    }
+
                     $output .='
                                             </td>
                                             <td><img src="img/c_icons/'.$data['race'].'-'.$data['gender'].'.gif" onmousemove="toolTip(\''.char_get_race_name($data['race']).'\', \'item_tooltip\')" onmouseout="toolTip()" alt="" /></td>
@@ -268,11 +277,12 @@ function char_friends(&$sqlr, &$sqlc)
             </center>
             <!-- end of char_friends.php -->';
         }
-        else
+        else{
             error($lang_char['no_permission']);
-    }
-    else
+        }
+    } else {
         error($lang_char['no_char_found']);
+    }
 }
 
 
@@ -281,7 +291,6 @@ function char_friends(&$sqlr, &$sqlc)
 //########################################################################################################################
 
 // action variable reserved for future use
-//$action = (isset($_GET['action'])) ? $_GET['action'] : NULL;
 
 // load language
 $lang_char = lang_char();
@@ -293,13 +302,8 @@ $output .= '
 
 // we getting links to realm database and character database left behind by header
 // header does not need them anymore, might as well reuse the link
-char_friends($sqlr, $sqlc);
+char_friends($sqlr, $sqlc, $sqlm);
 
-//unset($action);
-unset($action_permission);
-unset($lang_char);
+unset($action_permission, $lang_char);
 
 require_once 'footer.php';
-
-
-?>
