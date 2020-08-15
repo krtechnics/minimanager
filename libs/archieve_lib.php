@@ -49,9 +49,11 @@ function achieve_get_category($id, &$sqlm)
 
 function achieve_get_id_category($id, &$sqlm)
 {
-    $achieve_cat = array();
-    $result = ($sqlm->query('SELECT id, name01, description01, rewarddesc01, rewpoints FROM dbc_achievement WHERE categoryid = \''.$id.'\' ORDER BY `order` DESC'));
-    while ($achieve_cat[] = $sqlm->fetch_assoc($result));
+    $achieve_cat = [];
+    $result = ($sqlm->query(
+        'SELECT id, name01, description01, rewarddesc01, rewpoints FROM dbc_achievement WHERE categoryid = \'' . $id . '\' ORDER BY `order` DESC'
+    ));
+    while ($achieve_cat[] = $sqlm->fetch_assoc($result)) ;
     return $achieve_cat;
 }
 
@@ -61,9 +63,11 @@ function achieve_get_id_category($id, &$sqlm)
 
 function achieve_get_main_category(&$sqlm)
 {
-    $main_cat = array();
-    $result = $sqlm->query('SELECT id, name01 FROM dbc_achievement_category WHERE parentid = -1 and id != 1 ORDER BY `order` ASC');
-    while ($main_cat[] = $sqlm->fetch_assoc($result));
+    $main_cat = [];
+    $result = $sqlm->query(
+        'SELECT id, name01 FROM dbc_achievement_category WHERE parentid = -1 and id != 1 ORDER BY `order` ASC'
+    );
+    while ($main_cat[] = $sqlm->fetch_assoc($result)) ;
     return $main_cat;
 }
 
@@ -73,12 +77,17 @@ function achieve_get_main_category(&$sqlm)
 
 function achieve_get_sub_category(&$sqlm)
 {
-    $sub_cat = array();
-    $result = $sqlm->query('SELECT id, parentid, name01 FROM dbc_achievement_category WHERE parentid != -1 ORDER BY `order` ASC');
+    $sub_cat = [];
+    $result = $sqlm->query(
+        'SELECT id, parentid, name01 FROM dbc_achievement_category WHERE parentid != -1 ORDER BY `order` ASC'
+    );
     $temp = $sqlm->fetch_assoc($result);
-    while ($sub_cat[$temp['parentid']][$temp['id']] = $temp['name01'])
+    while ($sub_cat[$temp['parentid']][$temp['id']] = $temp['name01']) {
         $temp = $sqlm->fetch_assoc($result);
-
+        if ($temp === null) {
+            break;
+        }
+    }
     return $sub_cat;
 }
 
@@ -88,9 +97,10 @@ function achieve_get_sub_category(&$sqlm)
 
 function achieve_get_details($id, &$sqlm)
 {
-    $result = ($sqlm->query('SELECT id, name01, description01, rewarddesc01, rewpoints FROM dbc_achievement WHERE id = \''.$id.'\' LIMIT 1'));
-    $details = $sqlm->fetch_assoc($result);
-    return $details;
+    $result = ($sqlm->query(
+        'SELECT id, name01, description01, rewarddesc01, rewpoints FROM dbc_achievement WHERE id = \'' . $id . '\' LIMIT 1'
+    ));
+    return $sqlm->fetch_assoc($result);
 }
 
 
@@ -101,45 +111,28 @@ function achieve_get_icon($achieveid, &$sqlm)
 {
     global $item_icons;
 
-    $result = $sqlm->query('SELECT field_42 FROM dbc_achievement WHERE id = \''.$achieveid.'\' LIMIT 1');
+    $result = $sqlm->query(
+        'SELECT s.field_1 FROM dbc_achievement a JOIN dbc_spellicon s ON (a.field_42 = s.id) WHERE a.id = \'' . $achieveid . '\' LIMIT 1'
+    );
 
-    if ($result)
-    {
-        $displayid = $sqlm->result($result, 0);
-    }
-    else
-    {
-        $displayid = 0;
-    }
 
-    if ($displayid)
-    {
-        $result = $sqlm->query('SELECT field_1 FROM dbc_spellicon WHERE id = '.$displayid.' LIMIT 1');
+    if ($result) {
+        $achieve_uppercase = $sqlm->result(
+            $result,
+            0
+        );
+        $achieve = strtolower($achieve_uppercase);
+        $achieve_icon = substr(
+            $achieve,
+            16
+        );
 
-        if($result)
-        {
-            $achieve_uppercase = $sqlm->result($result, 0);
-            $achieve = strtolower($achieve_uppercase);
-            $achieve_icon = substr($achieve, 16);
-
-            if ($achieve_icon && file_exists(''.$item_icons.'/'.$achieve_icon.'.jpg'))
-            {
-                return ''.$item_icons .'/'.$achieve_icon.'.jpg';
-            }
-            else
-            {
-                return ''.$item_icons .'/inv_misc_questionmark.jpg';
-            }
+        if ($achieve_icon && file_exists('' . $item_icons . '/' . $achieve_icon . '.jpg')) {
+            return $item_icons . '/' . $achieve_icon . '.jpg';
         }
-        else
-        {
-            return ''.$item_icons .'/inv_misc_questionmark.jpg';
-        }
+
+        return $item_icons . '/inv_misc_questionmark.jpg';
     }
-    else
-    {
-        return ''.$item_icons .'/inv_misc_questionmark.jpg';
-    }
+
+    return $item_icons . '/inv_misc_questionmark.jpg';
 }
-
-?>
