@@ -11,12 +11,9 @@ valid_login($action_permission['read']);
 //#############################################################################
 // SHOW CHARACTERS ACHIEVEMENTS
 //#############################################################################
-function char_achievements(&$sqlr, &$sqlc)
+function char_achievements(SQL $sqlm, &$sqlr, &$sqlc)
 {
-    global $output, $lang_global, $lang_char,
-            $realm_id, $characters_db, $mmfpm_db,
-            $action_permission, $user_lvl, $user_name,
-            $achievement_datasite;
+    global $output, $lang_char, $user_lvl, $user_name, $achievement_datasite;
 
     // this page uses wowhead tooltops
     wowhead_tt();
@@ -24,8 +21,10 @@ function char_achievements(&$sqlr, &$sqlc)
     require_once 'core/char/char_security.php';
 
     $show_type = (isset($_POST['show_type'])) ? $sqlc->quote_smart($_POST['show_type']) : 0;
-    if (is_numeric($show_type));
-        else $show_type = 0;
+    if (!is_numeric($show_type)){
+        $show_type = 0;
+    }
+
 
     // getting character data from database
     $result = $sqlc->query('SELECT account, BINARY name AS name, race, class, level, gender
@@ -41,8 +40,10 @@ function char_achievements(&$sqlr, &$sqlc)
         $result = $sqlr->query('SELECT username, SecurityLevel AS gmlevel FROM account LEFT JOIN account_access ON account.id=account_access.AccountID WHERE account.id = '.$owner_acc_id.' ORDER BY gmlevel DESC LIMIT 1');
         $owner_name = $sqlr->result($result, 0, 'username');
         $owner_gmlvl = $sqlr->result($result, 0, 'gmlevel');
-        if (empty($owner_gmlvl))
+        if (empty($owner_gmlvl)){
             $owner_gmlvl = 0;
+        }
+
 
         // check user permission
         if ( ($user_lvl > $owner_gmlvl) || ($owner_name === $user_name) )
@@ -185,9 +186,6 @@ function char_achievements(&$sqlr, &$sqlc)
                         <br /><br />';
             //---------------Page Specific Data Starts Here--------------------------
 
-            $sqlm = new SQL;
-            $sqlm->connect($mmfpm_db['addr'], $mmfpm_db['user'], $mmfpm_db['pass'], $mmfpm_db['name']);
-
             $output .= '
                         <table class="top_hidden" style="width: 90%;">
                             <tr>
@@ -199,18 +197,24 @@ function char_achievements(&$sqlr, &$sqlc)
                                         '.$lang_char['show'].' :
                                         <select name="show_type">
                                             <option value="1"';
-            if (1 == $show_type)
+            if (1 == $show_type){
                 $output .= ' selected="selected"';
+            }
+
 
             $output .= '>'.$lang_char['all'].'</option>
                                             <option value="0"';
-            if (0 == $show_type)
+            if (0 == $show_type){
                 $output .= ' selected="selected"';
+            }
+
 
             $output .= '>'.$lang_char['earned'].'</option>
                                             <option value="2"';
-            if (2 == $show_type)
+            if (2 == $show_type){
                 $output .= ' selected="selected"';
+            }
+
 
             $output .= '>'.$lang_char['incomplete'].'</option>
                                         </select>
@@ -239,8 +243,9 @@ function char_achievements(&$sqlr, &$sqlc)
                                         </tr>';
             $result = $sqlc->query('SELECT achievement, date FROM character_achievement WHERE guid = '.$id.'');
             $char_achieve = array();
-            while ($temp = $sqlc->fetch_assoc($result))
+            while ($temp = $sqlc->fetch_assoc($result)){
                 $char_achieve[$temp['achievement']] = $temp['date'];
+            }
             $result = $sqlc->query('SELECT achievement, date FROM character_achievement WHERE guid = \''.$id.'\' order by date DESC limit 4');
 
             $points = 0;
@@ -248,10 +253,10 @@ function char_achievements(&$sqlr, &$sqlc)
             $main_cats = achieve_get_main_category($sqlm);
             $sub_cats  = achieve_get_sub_category($sqlm);
 
-            $output_achieve_main_cat = array();
-            $output_u_achieve_main_cat = array();
-            $output_achieve_sub_cat = array();
-            $output_u_achieve_sub_cat = array();
+            $output_achieve_main_cat = [];
+            $output_u_achieve_main_cat = [];
+            $output_achieve_sub_cat = [];
+            $output_u_achieve_sub_cat = [];
 
             $js_main_cats = '
                     var main_cats = new Array();
@@ -479,10 +484,14 @@ function char_achievements(&$sqlr, &$sqlc)
                                 </td>
                                 <td>';
 
-            foreach($output_achieve_main_cat as $temp)
+            foreach($output_achieve_main_cat as $temp){
                 $output .= $temp;
-            foreach($output_achieve_sub_cat as $temp)
+            }
+
+            foreach($output_achieve_sub_cat as $temp){
                 $output .= $temp;
+            }
+
 
             unset($temp);
             unset($output_achieve_main_cat);
@@ -569,13 +578,10 @@ $output .= '
 
 // we getting links to realm database and character database left behind by header
 // header does not need them anymore, might as well reuse the link
-char_achievements($sqlr, $sqlc);
+char_achievements($sqlm, $sqlr, $sqlc);
 
 //unset($action);
 unset($action_permission);
 unset($lang_char);
 
 require_once 'footer.php';
-
-
-?>
