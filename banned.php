@@ -20,16 +20,20 @@ function show_list()
 
     //==========================$_GET and SECURE=================================
     $start = (isset($_GET['start'])) ? $sqlr->quote_smart($_GET['start']) : 0;
-    if (is_numeric($start));
-    else $start=0;
+    if (!is_numeric($start)){
+        $start=0;
+    }
 
     $order_by = (isset($_GET['order_by'])) ? $sqlr->quote_smart($_GET['order_by']) : "$key_field";
-    if (!preg_match("/^[_[:lower:]]{1,12}$/", $order_by))
+    if (!preg_match("/^[_[:lower:]]{1,12}$/", $order_by)){
         $order_by="$key_field";
+    }
 
     $dir = (isset($_GET['dir'])) ? $sqlr->quote_smart($_GET['dir']) : 1;
-    if (!preg_match("/^[01]{1}$/", $dir))
+    if (!preg_match("/^[01]{1}$/", $dir)){
         $dir=1;
+    }
+
 
     $order_dir = ($dir) ? "ASC" : "DESC";
     $dir = ($dir) ? 0 : 1;
@@ -40,19 +44,25 @@ function show_list()
     $all_record = $sqlr->result($query_1,0);
 
     $result = $sqlr->query("SELECT $key_field, bandate, unbandate, bannedby, SUBSTRING_INDEX(banreason,' ',3) FROM $fromwhere ORDER BY $order_by $order_dir LIMIT $start, $itemperpage");
-    $this_page = $sqlr->num_rows($result);
 
     $output .= "
         <center>
             <table class=\"top_hidden\">
                 <tr>
                     <td>";
-    if($user_lvl >= $action_permission['insert'])
+    if($user_lvl >= $action_permission['insert']){
         makebutton($lang_banned['add_to_banned'], "banned.php?action=add_entry\" type=\"wrn",180);
-    if ($ban_type === "account_banned")
+    }
+
+    if ($ban_type === "account_banned"){
         makebutton($lang_banned['banned_ips'], "banned.php?ban_type=ip_banned",130);
-    else
-        makebutton($lang_banned['banned_accounts'], "banned.php?ban_type=account_banned",130);
+    } else {
+        makebutton(
+            $lang_banned['banned_accounts'],
+            "banned.php?ban_type=account_banned",
+            130
+        );
+    }
     makebutton($lang_global['back'], "javascript:window.history.back()\" type=\"def",130);
 
     $output .= "
@@ -91,10 +101,12 @@ function show_list()
         $output .= "
                 <tr>
                     <td>";
-        if($user_lvl >= $action_permission['delete'])
+        if($user_lvl >= $action_permission['delete']){
             $output .= "
                         <img src=\"img/aff_cross.png\" alt=\"\" onclick=\"answerBox('{$lang_global['delete']}: <font color=white>$owner_acc_name</font><br />{$lang_global['are_you_sure']}', del_banned + '$ban[0]');\" style=\"cursor:pointer;\" alt=\"\" />";
-        $output .= "
+
+        }
+                    $output .= "
                     </td>
                     <td>$name_out</td>
                     <td>".date('d-m-Y G:i', $ban[1])."</td>
@@ -125,26 +137,33 @@ function do_delete_entry()
     $sqlr->connect($realm_db['addr'], $realm_db['user'], $realm_db['pass'], $realm_db['name']);
 
     if(isset($_GET['ban_type']))
+    {
         $ban_type = $sqlr->quote_smart($_GET['ban_type']);
-    else
+    } else {
         redirect("banned.php?error=1");
+    }
+
 
     $key_field = ($ban_type == "account_banned") ? "id" : "ip";
 
-    if(isset($_GET[$key_field]))
+    if(isset($_GET[$key_field])) {
         $entry = $sqlr->quote_smart($_GET[$key_field]);
-    else
+    } else {
         redirect("banned.php?error=1");
-
-    if($ban_type == 'account_banned')
+    }
+    if($ban_type == 'account_banned'){
         $sqlr->query("UPDATE account_banned SET active = '0' WHERE $key_field = '$entry'");
-    else
+    } else{
         $sqlr->query("DELETE FROM $ban_type WHERE $key_field = '$entry'");
+    }
+
 
     if ($sqlr->affected_rows())
+    {
         redirect("banned.php?error=3&ban_type=$ban_type");
-    else
+    } else {
         redirect("banned.php?error=2&ban_type=$ban_type");
+    }
 }
 
 
@@ -220,8 +239,10 @@ function do_add_entry()
     global $realm_db, $user_name, $output, $action_permission, $user_lvl;
     valid_login($action_permission['insert']);
 
-    if((empty($_GET['ban_type']))||(empty($_GET['entry'])) ||(empty($_GET['bantime'])))
+    if(empty($_GET['ban_type'])||empty($_GET['entry']) ||empty($_GET['bantime'])){
         redirect("banned.php?error=1&action=add_entry");
+    }
+
 
     $sqlr = new SQL;
     $sqlr->connect($realm_db['addr'], $realm_db['user'], $realm_db['pass'], $realm_db['name']);
@@ -232,10 +253,11 @@ function do_add_entry()
     if ($ban_type == "account_banned")
     {
         $result1 = $sqlr->query("SELECT id FROM account WHERE username ='$entry'");
-        if (!$sqlr->num_rows($result1))
+        if (!$sqlr->num_rows($result1)){
             redirect("banned.php?error=4&action=add_entry");
-        else
+        } else{
             $entry = $sqlr->result($result1, 0, 'id');
+        }
     }
 
     $bantime = time() + (3600 * $sqlr->quote_smart($_GET['bantime']));
@@ -244,25 +266,29 @@ function do_add_entry()
     if ($ban_type === "account_banned")
     {
         $result = $sqlr->query("SELECT count(*) FROM account_banned WHERE id = '$entry'");
-        if(!$sqlr->result($result, 0))
+        if(!$sqlr->result($result, 0)){
             $sqlr->query("INSERT INTO account_banned (id, bandate, unbandate, bannedby, banreason, active)
                             VALUES ('$entry',".time().",$bantime,'$user_name','$banreason', 1)");
+        }
+    } else {
+        $sqlr->query(
+            "INSERT INTO ip_banned (ip, bandate, unbandate, bannedby, banreason)
+                        VALUES ('$entry'," . time() . ",$bantime,'$user_name','$banreason')"
+        );
     }
-    else
-        $sqlr->query("INSERT INTO ip_banned (ip, bandate, unbandate, bannedby, banreason)
-                        VALUES ('$entry',".time().",$bantime,'$user_name','$banreason')");
 
-    if ($sqlr->affected_rows())
+    if ($sqlr->affected_rows()){
         redirect("banned.php?error=3&ban_type=$ban_type");
-    else
+    } else {
         redirect("banned.php?error=2&ban_type=$ban_type");
+    }
 }
 
 
 //########################################################################################################################
 // MAIN
 //########################################################################################################################
-$err = (isset($_GET['error'])) ? $_GET['error'] : NULL;
+$err = $_GET['error'] ?? null;
 
 $output .= "
         <div class=\"top\">";
@@ -302,13 +328,14 @@ switch ($err)
     default: //no error
         $output .= "
           <h1>{$lang_banned['banned_list']}</h1>";
+         break;
 }
 unset($err);
 
 $output .= "
         </div>";
 
-$action = (isset($_GET['action'])) ? $_GET['action'] : NULL;
+$action = $_GET['action'] ?? null;
 
 switch ($action)
 {
@@ -328,9 +355,7 @@ switch ($action)
         show_list();
 }
 
-unset($action);
-unset($action_permission);
-unset($lang_banned);
+unset($action, $action_permission, $lang_banned);
 
 require_once("footer.php");
 
