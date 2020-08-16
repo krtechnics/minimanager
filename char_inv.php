@@ -11,7 +11,7 @@ valid_login($action_permission['read']);
 //#############################################################################
 // SHOW INV. AND BANK ITEMS
 //#############################################################################
-function char_inv(&$sqlr, &$sqlc)
+function char_inv(SQL $sqlm, &$sqlr, &$sqlc, SQL $sqlw)
 {
     global $output, $lang_global, $lang_char, $lang_item,
             $realm_id, $characters_db, $world_db, $mmfpm_db,
@@ -37,8 +37,10 @@ function char_inv(&$sqlr, &$sqlc)
         $result = $sqlr->query('SELECT username, SecurityLevel AS gmlevel FROM account LEFT JOIN account_access ON account.id = account_access.AccountID WHERE account.id = '.$owner_acc_id.' AND account_access.RealmID = ' . $realmid . ' ORDER BY `gmlevel` DESC LIMIT 1');
         $owner_name = $sqlr->result($result, 0, 'username');
         $owner_gmlvl = $sqlr->result($result, 0, 'gmlevel');
-        if (empty($owner_gmlvl))
+        if (empty($owner_gmlvl)){
             $owner_gmlvl = 0;
+        }
+
 
         // check user permission
         if (($user_lvl > $owner_gmlvl)||($owner_name === $user_name))
@@ -54,39 +56,38 @@ function char_inv(&$sqlr, &$sqlc)
             //  we have lots to do for inventory
 
             // character bags, 1 main + 4 additional
-            $bag = array
-            (
-                0=>array(),
-                1=>array(),
-                2=>array(),
-                3=>array(),
-                4=>array()
-            );
+            $bag =
+                [
+                    0=> [],
+                    1=> [],
+                    2=> [],
+                    3=> [],
+                    4=> []
+                ];
 
             // character bang, 1 main + 7 additional
-            $bank = array
-            (
-                0=>array(),
-                1=>array(),
-                2=>array(),
-                3=>array(),
-                4=>array(),
-                5=>array(),
-                6=>array(),
-                7=>array()
-            );
+            $bank =
+                [
+                    0=> [],
+                    1=> [],
+                    2=> [],
+                    3=> [],
+                    4=> [],
+                    5=> [],
+                    6=> [],
+                    7=> []
+                ];
 
             // this is where we will put items that are in main bag
-            $bag_id = array();
+            $bag_id = [];
             // this is where we will put items that are in main bank
-            $bank_bag_id = array();
+            $bank_bag_id = [];
             // this is where we will put items that are in character bags, 4 arrays, 1 for each
-            $equiped_bag_id = array(0,0,0,0,0);
+            $equiped_bag_id = [0, 0, 0, 0, 0];
             // this is where we will put items that are in bank bangs, 7 arrays, 1 for each
-            $equip_bnk_bag_id = array(0,0,0,0,0,0,0,0);
+            $equip_bnk_bag_id = [0, 0, 0, 0, 0, 0, 0, 0];
 
-            $sqlw = new SQL;
-            $sqlw->connect($world_db[$realmid]['addr'], $world_db[$realmid]['user'], $world_db[$realmid]['pass'], $world_db[$realmid]['name']);
+
 
             // we load the things in each bag slot
             while ($slot = $sqlc->fetch_assoc($result))
@@ -101,13 +102,16 @@ function char_inv(&$sqlr, &$sqlc)
                     }
                     elseif($slot['slot'] < 39) // SLOT 23 TO 38 (BackPack)
                     {
-                        if(isset($bag[0][$slot['slot']-23]))
+                        if(isset($bag[0][$slot['slot']-23])){
                             $bag[0][$slot['slot']-23][0]++;
-                        else
+                        } else{
                             $bag[0][$slot['slot']-23] = array($slot['itemEntry'],0,$slot['stack_count']);
+                        }
                     }
                     elseif($slot['slot'] < 67) // SLOT 39 TO 66 (Bank)
+                    {
                         $bank[0][$slot['slot']-39] = array($slot['itemEntry'],0,$slot['stack_count']);
+                    }
                     elseif($slot['slot'] < 74) // SLOT 67 TO 73 (Bank Bags)
                     {
                         $bank_bag_id[$slot['item']] = ($slot['slot']-66);
@@ -120,14 +124,17 @@ function char_inv(&$sqlr, &$sqlc)
                     // Bags
                     if (isset($bag_id[$slot['bag']]))
                     {
-                        if(isset($bag[$bag_id[$slot['bag']]][$slot['slot']]))
+                        if(isset($bag[$bag_id[$slot['bag']]][$slot['slot']])){
                             $bag[$bag_id[$slot['bag']]][$slot['slot']][1]++;
-                        else
+                        }
+                        else{
                             $bag[$bag_id[$slot['bag']]][$slot['slot']] = array($slot['itemEntry'],0,$slot['stack_count']);
+                        }
                     }
                     // Bank Bags
-                    elseif (isset($bank_bag_id[$slot['bag']]))
+                    elseif (isset($bank_bag_id[$slot['bag']])){
                         $bank[$bank_bag_id[$slot['bag']]][$slot['slot']] = array($slot['itemEntry'],0,$slot['stack_count']);
+                    }
                 }
             }
             unset($slot);
@@ -153,8 +160,6 @@ function char_inv(&$sqlr, &$sqlc)
                                 <tr>';
 
             //---------------Page Specific Data Starts Here--------------------------
-            $sqlm = new SQL;
-            $sqlm->connect($mmfpm_db['addr'], $mmfpm_db['user'], $mmfpm_db['pass'], $mmfpm_db['name']);
 
             // equipped bags
             for($i=1; $i < 5; ++$i)
@@ -162,12 +167,14 @@ function char_inv(&$sqlr, &$sqlc)
                 $output .= '
                                     <th>';
                 if($equiped_bag_id[$i])
+                {
                     $output .='
                                         <a style="padding:2px;" href="'.$item_datasite.$equiped_bag_id[$i][0].'" target="_blank">
                                             <img class="bag_icon" src="'.get_item_icon($equiped_bag_id[$i][0], $sqlm, $sqlw).'" alt="" />
                                         </a>
                                         '.$lang_item['bag'].' '.$i.'<br />
                                         <font class="small">'.$equiped_bag_id[$i][1].' '.$lang_item['slots'].'</font>';
+                }
                 $output .= '
                                     </th>';
             }
@@ -178,17 +185,19 @@ function char_inv(&$sqlr, &$sqlc)
             // equipped bag slots
             for($t = 1; $t < 5; ++$t)
             {
-                $output .= '
+                if($equiped_bag_id[$t] != 0){
+                    $output .= '
                                     <td class="bag" valign="bottom" align="center">
                                         <div style="width:'.(4*43).'px;height:'.(ceil($equiped_bag_id[$t][1]/4)*41).'px;">';
-                $dsp = $equiped_bag_id[$t][1]%4;
-                if ($dsp)
-                    $output .= '
+                    $dsp = $equiped_bag_id[$t][1]%4;
+                    if ($dsp){
+                        $output .= '
                                             <div class="no_slot"></div>';
-                foreach ($bag[$t] as $pos => $item)
-                {
-                    $item[2] = $item[2] == 1 ? '' : $item[2];
-                    $output .= '
+                    }
+                    foreach ($bag[$t] as $pos => $item)
+                    {
+                        $item[2] = $item[2] == 1 ? '' : $item[2];
+                        $output .= '
                                             <div style="left:'.(($pos+$dsp)%4*42).'px;top:'.(floor(($pos+$dsp)/4)*41).'px;">
                                                 <a style="padding:2px;" href="'.$item_datasite.$item[0].'" target="_blank">
                                                     <img src="'.get_item_icon($item[0], $sqlm, $sqlw).'" alt="" />
@@ -196,10 +205,13 @@ function char_inv(&$sqlr, &$sqlc)
                                                 <div style="width:25px;margin:-20px 0px 0px 18px;color: black; font-size:14px">'.$item[2].'</div>
                                                 <div style="width:25px;margin:-21px 0px 0px 17px;font-size:14px">'.$item[2].'</div>
                                             </div>';
-                }
-                $output .= '
+                    }
+                    $output .= '
                                         </div>
                                     </td>';
+                }else{
+                    $output .= '<td class="bag" valign="bottom" align="center"></td>';
+                }
             }
             unset($equiped_bag_id);
             $output .= '
@@ -315,18 +327,21 @@ function char_inv(&$sqlr, &$sqlc)
                                     </tr>
                                     <tr>';
                 }
-                $output .= '
+                if($equip_bnk_bag_id[$t] != 0){
+                    $output .= '
                                         <td class="bank" align="center">
                                             <div style="width:'.(4*43).'px;height:'.(ceil($equip_bnk_bag_id[$t][1]/4)*41).'px;">';
-                $dsp=$equip_bnk_bag_id[$t][1]%4;
+                    $dsp=$equip_bnk_bag_id[$t][1]%4;
 
-                if ($dsp)
-                    $output .= '
+                    if ($dsp){
+                        $output .= '
                                                 <div class="no_slot"></div>';
-                foreach ($bank[$t] as $pos => $item)
-                {
-                    $item[2] = $item[2] == 1 ? '' : $item[2];
-                    $output .= '
+                    }
+
+                    foreach ($bank[$t] as $pos => $item)
+                    {
+                        $item[2] = $item[2] == 1 ? '' : $item[2];
+                        $output .= '
                                                     <div style="left:'.(($pos+$dsp)%4*43).'px;top:'.(floor(($pos+$dsp)/4)*41).'px;">
                                                         <a style="padding:2px;" href="'.$item_datasite.$item[0].'" target="_blank">
                                                             <img src="'.get_item_icon($item[0], $sqlm, $sqlw).'" alt="" />
@@ -334,11 +349,14 @@ function char_inv(&$sqlr, &$sqlc)
                                                     <div style="width:25px;margin:-20px 0px 0px 18px;color: black; font-size:14px">'.$item[2].'</div>
                                                     <div style="width:25px;margin:-21px 0px 0px 17px;font-size:14px">'.$item[2].'</div>
                                                 </div>';
-                }
+                    }
 
-                $output .= '
+                    $output .= '
                                             </div>
                                         </td>';
+                }else{
+                    $output .= '<td class="bank" align="center"></td>';
+                }
             }
             unset($equip_bnk_bag_id);
             unset($bank);
@@ -360,12 +378,12 @@ function char_inv(&$sqlr, &$sqlc)
                         <br />
                     </center>
                     <!-- end of char_inv.php -->';
-        }
-        else
+        } else {
             error($lang_char['no_permission']);
-    }
-    else
+        }
+    } else {
         error($lang_char['no_char_found']);
+    }
 }
 
 
@@ -386,7 +404,11 @@ $output .= '
 
 // we getting links to realm database and character database left behind by header
 // header does not need them anymore, might as well reuse the link
-char_inv($sqlr, $sqlc);
+
+$sqlw = new SQL;
+$sqlw->connect($world_db[$realm_id]['addr'], $world_db[$realm_id]['user'], $world_db[$realm_id]['pass'], $world_db[$realm_id]['name']);
+
+char_inv($sqlm, $sqlr, $sqlc, $sqlw);
 
 //unset($action);
 unset($action_permission);
